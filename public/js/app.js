@@ -10,7 +10,12 @@
 
   // Change this so different groups don't bump into each other on the shared broker.
   const ROOM = "tojigang";
-  const BROKER = "wss://broker.emqx.io:8084/mqtt";
+  const BROKERS = [
+    "wss://broker.emqx.io:8084/mqtt",
+    "wss://test.mosquitto.org:8081/mqtt",
+    "wss://broker.hivemq.com:8884/mqtt",
+  ];
+  const BROKER_TIMEOUT_MS = 10000;
   const HEARTBEAT_MS = 7000;
   const PRESENCE_STALE_MS = 18000;
   const REQUEST_TTL_MS = 30000;
@@ -92,6 +97,17 @@
     while (wrap.children.length > 3) wrap.firstElementChild.remove();
   }
 
+  function setConnStatus(message, kind) {
+    const el = $("conn-status");
+    if (!message) {
+      el.classList.add("hidden");
+      el.textContent = "";
+      return;
+    }
+    el.textContent = message;
+    el.className = "conn-status " + (kind || "info");
+  }
+
   // ---------- login ----------
   const quickForm = $("quick-login");
   const quickInput = $("quick-id");
@@ -130,6 +146,7 @@
     state.profile = null;
     state.users.clear();
     state.game = null;
+    setConnStatus("");
     localStorage.removeItem(PROFILE_KEY);
     showScreen("login");
   }
@@ -138,15 +155,39 @@
   function startSession(profile) {
     state.profile = profile;
     state.sessionId = `${profile.id}_${rand()}`;
-    state.mqtt = mqtt.connect(BROKER, {
+    setConnStatus("Connecting to the candy network… 🍬", "info");
+    tryBroker(profile, 0);
+  }
+
+  function tryBroker(profile, i) {
+    if (i >= BROKERS.length) {
+      setConnStatus(
+        "Couldn't reach any realtime broker — this network may be blocking WebSocket connections. Try a different network or another browser.",
+        "error"
+      );
+      toast("⚠️ Connection failed");
+      return;
+    }
+    const client = mqtt.connect(BROKERS[i], {
       clientId: `cg_${state.sessionId}`,
       keepalive: 10,
       reconnectPeriod: 3000,
       will: { topic: T.presence(profile.id), payload: "", qos: 0, retain: false },
     });
+    let aborted = false;
+    const timer = setTimeout(() => {
+      if (aborted) return;
+      aborted = true;
+      try { client.end(true); } catch { /* ignore */ }
+      tryBroker(profile, i + 1);
+    }, BROKER_TIMEOUT_MS);
 
-    state.mqtt.on("connect", () => {
+    client.on("connect", () => {
+      if (aborted) return;
+      clearTimeout(timer);
+      state.mqtt = client;
       state.connected = true;
+      setConnStatus("");
       state.mqtt.subscribe(T.presenceAll());
       state.mqtt.subscribe(T.req(profile.id));
       publishPresenceNow("");
@@ -155,8 +196,9 @@
       showScreen("home");
     });
 
-    state.mqtt.on("reconnect", () => toast("🔄 Reconnecting…"));
-    state.mqtt.on("message", onMqttMessage);
+    // Transient errors are fine — mqtt.js keeps retrying until the timeout above fires.
+    client.on("error", () => { /* ignore */ });
+    client.on("message", onMqttMessage);
   }
 
   function startHeartbeat() {
@@ -723,6 +765,22 @@
   // ---------- boot ----------
   function boot() {
     buildBoard();
+    if (window.mqtt) return startApp();
+    setConnStatus("Loading the candy network… 🍬", "info");
+    window.__onMqttLoaded = (ok) => {
+      if (!ok) {
+        setConnStatus(
+          "Couldn't load the connection library from any CDN — this network may be blocking it. Try a different network or another browser.",
+          "error"
+        );
+        return;
+      }
+      startApp();
+    };
+  }
+
+  function startApp() {
+    setConnStatus("");
     const saved = localStorage.getItem(PROFILE_KEY);
     if (saved) {
       try {
