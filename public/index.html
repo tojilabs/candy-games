@@ -34,12 +34,9 @@
           <input id="quick-nick" type="text" maxlength="30" placeholder="Nickname (optional)" />
           <button id="quick-btn" type="submit" class="pill">Log in 🍭</button>
           <p id="quick-error" class="quick-error hidden"></p>
-          <p id="quick-hint" class="quick-hint"></p>
+          <p class="quick-hint">Any number works — your nickname shows on your profile.</p>
         </form>
-        <div id="config-hint" class="config-hint hidden">
-          ℹ️ No bot configured — any number works and friends pick nicknames. Add
-          <code>BOT_USERNAME</code> / <code>BOT_TOKEN</code> env vars later to auto-pull real names &amp; profile pics.
-        </div>
+        <p class="fine">Log in with your Telegram ID — pick a nickname, and your name &amp; pic show to the gang.</p>
         <p class="fine">Log in with your Telegram ID — your name &amp; profile pic are pulled automatically.</p>
       </div>
     </section>
@@ -127,7 +124,7 @@
 
   <div id="toasts" class="toasts"></div>
 
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mqtt@5/dist/mqtt.min.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

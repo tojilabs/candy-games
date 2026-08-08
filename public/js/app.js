@@ -1,23 +1,25 @@
-// app.js — Candy Games frontend: Telegram login, live presence, challenge
-// requests, and the 1v1 Tic-Tac-Toe screen with realtime updates.
+// app.js — Candy Games (static / GitHub Pages build).
+// Realtime works over a public MQTT broker (no backend needed): presence,
+// game requests, and the 1v1 Tic-Tac-Toe engine all run in the browser.
 (() => {
   "use strict";
 
   const $ = (id) => document.getElementById(id);
   const screens = { login: $("screen-login"), home: $("screen-home"), game: $("screen-game") };
-  const TOKEN_KEY = "candygames.token";
+  const PROFILE_KEY = "candygames.profile";
 
-  const state = {
-    token: localStorage.getItem(TOKEN_KEY) || null,
-    profile: null,
-    socket: null,
-    users: [],
-    requestId: null,
-    requestQueue: [],
-    game: null,
-    boardButtons: [],
-    rematchVote: false,
-  };
+  // Change this so different groups don't bump into each other on the shared broker.
+  const ROOM = "tojigang";
+  const BROKER = "wss://broker.emqx.io:8084/mqtt";
+  const HEARTBEAT_MS = 7000;
+  const PRESENCE_STALE_MS = 18000;
+  const REQUEST_TTL_MS = 30000;
+
+  const WIN_LINES = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+    [0, 4, 8], [2, 4, 6],
+  ];
 
   const AVATAR_COLORS = [
     "linear-gradient(135deg,#ff9dbe,#a78bfa)",
@@ -27,6 +29,32 @@
     "linear-gradient(135deg,#ff8f6f,#ffc94d)",
   ];
 
+  const state = {
+    profile: null,
+    mqtt: null,
+    connected: false,
+    users: new Map(), // id -> { id, name, inGame, ts }
+    requestId: null,
+    requestQueue: [],
+    pendingRequest: null, // { reqId, to, timer }
+    game: null,
+    boardButtons: [],
+    heartbeatTimer: null,
+    pruneTimer: null,
+    sessionId: null,
+  };
+
+  const rand = () => Math.random().toString(36).slice(2, 10);
+  const colorFor = (id) => AVATAR_COLORS[Number(id) % AVATAR_COLORS.length];
+  const displayName = (p) => p.name || p.nickname || `Friend ${String(p.id).slice(-4)}`;
+
+  const T = {
+    presence: (id) => `cg/${ROOM}/presence/${id}`,
+    presenceAll: () => `cg/${ROOM}/presence/+`,
+    req: (id) => `cg/${ROOM}/req/${id}`,
+    game: (id) => `cg/${ROOM}/game/${id}`,
+  };
+
   // ---------- helpers ----------
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
@@ -35,18 +63,16 @@
     return node;
   };
 
-  const fullName = (p) => [p.firstName, p.lastName].filter(Boolean).join(" ") || p.username || "Friend";
-  const colorFor = (id) => AVATAR_COLORS[Number(id) % AVATAR_COLORS.length];
-
   function paintAvatar(node, p) {
     node.textContent = "";
     node.style.backgroundImage = "";
-    const initials = fullName(p).slice(0, 2).toUpperCase();
+    node.title = "";
+    const name = displayName(p);
     if (p.photo) {
       node.style.backgroundImage = `url(${p.photo})`;
-      node.title = fullName(p);
+      node.title = name;
     } else {
-      node.textContent = initials;
+      node.textContent = name.slice(0, 2).toUpperCase();
       node.style.background = colorFor(p.id);
     }
   }
@@ -85,121 +111,147 @@
       return;
     }
     const nickname = $("quick-nick").value.trim();
-    $("quick-btn").disabled = true;
-    fetch("/api/auth/id", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatId, nickname }),
-    })
-      .then((r) => r.json().then((j) => ({ ok: r.ok, ...j })))
-      .then(({ ok, token, profile, error }) => {
-        if (!ok) throw new Error(error || "Login failed");
-        state.token = token;
-        state.profile = profile;
-        localStorage.setItem(TOKEN_KEY, token);
-        state.socket.emit("auth", { token });
-      })
-      .catch((err) => showQuickError(err.message))
-      .finally(() => {
-        $("quick-btn").disabled = false;
-      });
+    const profile = {
+      id: chatId,
+      name: nickname || `Friend ${chatId.slice(-4)}`,
+    };
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    startSession(profile);
   });
 
   function logout() {
-    localStorage.removeItem(TOKEN_KEY);
-    state.token = null;
+    setInGame(false);
+    publishPresenceNow("");
+    cleanupTimers();
+    if (state.mqtt) {
+      try { state.mqtt.end(true); } catch { /* ignore */ }
+    }
+    state.mqtt = null;
     state.profile = null;
+    state.users.clear();
     state.game = null;
-    hideRequestBanner();
-    if (state.socket) state.socket.disconnect();
+    localStorage.removeItem(PROFILE_KEY);
     showScreen("login");
   }
 
-  // ---------- socket ----------
-  function connect() {
-    state.socket = io();
-
-    state.socket.on("connect", () => {
-      if (state.token) state.socket.emit("auth", { token: state.token });
+  // ---------- MQTT transport ----------
+  function startSession(profile) {
+    state.profile = profile;
+    state.sessionId = `${profile.id}_${rand()}`;
+    state.mqtt = mqtt.connect(BROKER, {
+      clientId: `cg_${state.sessionId}`,
+      keepalive: 10,
+      reconnectPeriod: 3000,
+      will: { topic: T.presence(profile.id), payload: "", qos: 0, retain: false },
     });
 
-    state.socket.on("auth:ok", ({ profile }) => {
-      state.profile = profile;
+    state.mqtt.on("connect", () => {
+      state.connected = true;
+      state.mqtt.subscribe(T.presenceAll());
+      state.mqtt.subscribe(T.req(profile.id));
+      publishPresenceNow("");
+      startHeartbeat();
       renderHome();
       showScreen("home");
     });
 
-    state.socket.on("auth:error", ({ message } = {}) => {
-      localStorage.removeItem(TOKEN_KEY);
-      state.token = null;
-      toast(message || "Session expired — log in again.");
-      showScreen("login");
-    });
-
-    state.socket.on("presence", (list) => {
-      state.users = list;
-      renderUsers();
-    });
-
-    state.socket.on("game:request_incoming", (req) => {
-      state.requestQueue.push(req);
-      if (!state.requestId) showNextRequest();
-    });
-
-    state.socket.on("game:request_sent", ({ to }) => toast(`🍬 Request sent to ${fullName(to.profile)}!`));
-
-    state.socket.on("game:request_declined", ({ name }) => toast(`${name} declined your challenge 😢`));
-
-    state.socket.on("game:request_expired", ({ requestId }) => {
-      if (state.requestId === requestId) {
-        state.requestId = null;
-        hideRequestBanner();
-        showNextRequest();
-      } else {
-        state.requestQueue = state.requestQueue.filter((r) => r.requestId !== requestId);
-      }
-      toast("⏳ That game request expired.");
-    });
-
-    state.socket.on("game:error", ({ message }) => toast(`⚠️ ${message}`));
-
-    state.socket.on("game:state", (view) => {
-      hideRequestBanner();
-      enterGame(view);
-    });
-
-    state.socket.on("game:closed", () => {
-      toast("👋 The game room closed.");
-      exitGame();
-    });
+    state.mqtt.on("reconnect", () => toast("🔄 Reconnecting…"));
+    state.mqtt.on("message", onMqttMessage);
   }
 
-  // ---------- home ----------
-  function renderHome() {
-    paintAvatar($("me-avatar"), state.profile);
-    $("me-name").textContent = state.profile.firstName || state.profile.username || "friend";
+  function startHeartbeat() {
+    cleanupTimers();
+    state.heartbeatTimer = setInterval(() => publishPresenceNow(""), HEARTBEAT_MS);
+    state.pruneTimer = setInterval(prunePresence, 10000);
+  }
+
+  function cleanupTimers() {
+    if (state.heartbeatTimer) clearInterval(state.heartbeatTimer);
+    if (state.pruneTimer) clearInterval(state.pruneTimer);
+    state.heartbeatTimer = state.pruneTimer = null;
+  }
+
+  function publishPresenceNow(empty) {
+    if (empty) {
+      safePublish(T.presence(state.profile.id), "");
+      return;
+    }
+    const g = state.game && state.game.status === "playing" ? 1 : 0;
+    const msg = { n: displayName(state.profile), g, ts: Date.now() };
+    safePublish(T.presence(state.profile.id), JSON.stringify(msg));
+  }
+
+  function setInGame(inGame) {
+    // Presence is recomputed on every heartbeat; fire one right away too.
+    publishPresenceNow();
+  }
+
+  function safePublish(topic, payload) {
+    if (state.connected && state.mqtt) {
+      try { state.mqtt.publish(topic, payload); } catch { /* ignore */ }
+    }
+  }
+
+  function onMqttMessage(topic, payloadBuffer) {
+    let topicParts = topic.split("/");
+    const kind = topicParts[2];
+    const payload = payloadBuffer.toString();
+
+    if (kind === "presence") return handlePresence(topicParts[3], payload);
+    if (kind === "req") return handleReq(payload);
+    if (kind === "game") return handleGame(payload);
+  }
+
+  // ---------- presence ----------
+  function handlePresence(id, payload) {
+    if (!payload) {
+      state.users.delete(id);
+      checkForfeitByGone(id);
+      renderUsers();
+      return;
+    }
+    let data;
+    try { data = JSON.parse(payload); } catch { return; }
+    if (!data.n) return;
+    state.users.set(id, { id, name: data.n, inGame: data.g === 1, ts: data.ts });
     renderUsers();
+  }
+
+  function prunePresence() {
+    const now = Date.now();
+    let changed = false;
+    for (const [id, u] of state.users) {
+      if (id === state.profile.id) continue;
+      if (now - u.ts > PRESENCE_STALE_MS) {
+        state.users.delete(id);
+        checkForfeitByGone(id);
+        changed = true;
+      }
+    }
+    if (changed) renderUsers();
+  }
+
+  function checkForfeitByGone(id) {
+    const g = state.game;
+    if (!g || g.status !== "playing") return;
+    if (opponentOf(g).id === id) forfeitGame("disconnect");
   }
 
   function renderUsers() {
     const list = $("user-list");
     list.innerHTML = "";
-    $("online-num").textContent = state.users.length;
+    const others = [...state.users.values()].filter((u) => u.id !== state.profile.id);
+    $("online-num").textContent = others.length;
 
-    if (!state.users.length) {
+    if (!others.length) {
       $("empty-state").classList.remove("hidden");
       return;
     }
     $("empty-state").classList.add("hidden");
 
-    const inGameWith = state.game
-      ? state.users.find((u) => u.id === state.game.opponent.profile.id)
-      : null;
+    const inGameWith = state.game && state.game.status === "playing" ? opponentOf(state.game).id : null;
 
-    state.users.forEach((u, i) => {
-      const isMe = state.profile && u.id === state.profile.id;
-      const busy = inGameWith && u.id === inGameWith.id;
-
+    others.forEach((u, i) => {
       const row = el("li", "user-row");
       row.style.animationDelay = `${i * 0.04}s`;
 
@@ -207,26 +259,22 @@
       paintAvatar(avatar, u);
 
       const info = el("div", "user-info");
-      const name = el("div", "user-name", isMe ? `${fullName(u)} (you)` : fullName(u));
-      const sub = el("div", "user-sub", u.username ? `@${u.username}` : "Member of the gang");
+      const name = el("div", "user-name", u.name);
+      const sub = el("div", "user-sub", "Member of the gang");
       info.append(name, sub);
 
-      const tag = el("span", "status-tag", isMe ? "It's you" : u.inGame ? "In a game" : "Online");
-      if (isMe) tag.classList.add("you");
-      else if (u.inGame) tag.classList.add("ingame");
+      const tag = el("span", "status-tag", u.inGame ? "In a game" : "Online");
+      if (u.inGame) tag.classList.add("ingame");
       else tag.prepend(el("span", "dot"));
 
       row.append(avatar, info, tag);
 
-      if (!isMe) {
+      const busy = u.id === inGameWith;
+      if (!busy) {
         const btn = el("button", "play-btn", "Play 🎮");
-        btn.disabled = u.inGame || busy;
+        btn.disabled = u.inGame;
         if (u.inGame) btn.textContent = "Playing";
-        if (busy) btn.textContent = "Playing you";
-        btn.addEventListener("click", () => {
-          if (state.game) return;
-          state.socket.emit("game:request", { to: u.id });
-        });
+        btn.addEventListener("click", () => sendInvite(u));
         row.append(btn);
       }
 
@@ -234,33 +282,191 @@
     });
   }
 
-  // ---------- request banner ----------
+  // ---------- game requests ----------
+  function sendInvite(target) {
+    if (state.game) return;
+    if (target.inGame) return toast("⚠️ They're already in a game.");
+    const reqId = rand();
+    state.pendingRequest = {
+      reqId,
+      to: target,
+      timer: setTimeout(() => {
+        safePublish(T.req(target.id), JSON.stringify({ t: "cancel", reqId }));
+        if (state.pendingRequest && state.pendingRequest.reqId === reqId) state.pendingRequest = null;
+        toast("⏳ Your challenge expired.");
+      }, REQUEST_TTL_MS),
+    };
+    safePublish(T.req(target.id), JSON.stringify({ t: "invite", reqId, from: { id: state.profile.id, name: displayName(state.profile) } }));
+    toast(`🍬 Challenge sent to ${target.name}!`);
+  }
+
+  function handleReq(payload) {
+    let m;
+    try { m = JSON.parse(payload); } catch { return; }
+
+    if (m.t === "invite") {
+      if (state.game && state.game.status === "playing") {
+        safePublish(T.req(m.from.id), JSON.stringify({ t: "reply", reqId: m.reqId, accept: false, from: { id: state.profile.id, name: displayName(state.profile) } }));
+        toast("⚠️ You're already in a game.");
+        return;
+      }
+      state.requestQueue.push({ reqId: m.reqId, from: m.from });
+      if (!state.requestId) showNextRequest();
+    } else if (m.t === "reply") {
+      const pending = state.pendingRequest;
+      if (!pending || pending.reqId !== m.reqId) return;
+      clearTimeout(pending.timer);
+      state.pendingRequest = null;
+      if (m.accept) startGame(pending.to);
+      else toast(`${m.from.name} declined your challenge 😢`);
+    } else if (m.t === "cancel") {
+      if (state.requestId === m.reqId) {
+        state.requestId = null;
+        $("request-banner").classList.add("hidden");
+        state.requestQueue = state.requestQueue.filter((r) => r.reqId !== m.reqId);
+        showNextRequest();
+        toast("⏳ That challenge expired.");
+      }
+    }
+  }
+
   function showNextRequest() {
     const req = state.requestQueue.shift();
     if (!req) return;
-    state.requestId = req.requestId;
-
-    paintAvatar($("rb-avatar"), req.from.profile);
-    $("rb-name").textContent = fullName(req.from.profile);
+    state.requestId = req.reqId;
+    state.currentReq = req;
+    paintAvatar($("rb-avatar"), { id: req.from.id, name: req.from.name });
+    $("rb-name").textContent = req.from.name;
     $("request-banner").classList.remove("hidden");
   }
 
   function hideRequestBanner() {
     state.requestId = null;
+    state.currentReq = null;
     $("request-banner").classList.add("hidden");
   }
 
   function respondRequest(accept) {
-    const requestId = state.requestId;
+    const req = state.currentReq;
     hideRequestBanner();
-    if (requestId) state.socket.emit("game:request_response", { requestId, accept });
+    if (req) {
+      safePublish(T.req(req.from.id), JSON.stringify({ t: "reply", reqId: req.reqId, accept, from: { id: state.profile.id, name: displayName(state.profile) } }));
+    }
     showNextRequest();
   }
 
   $("rb-accept").addEventListener("click", () => respondRequest(true));
   $("rb-decline").addEventListener("click", () => respondRequest(false));
 
-  // ---------- game ----------
+  // ---------- game engine ----------
+  const seatOf = (g) => (g.seats.X.id === state.profile.id ? "X" : "O");
+  const opponentOf = (g) => (g.seats.X.id === state.profile.id ? g.seats.O : g.seats.X);
+
+  function freshGame(gameId, a, b) {
+    // Randomize who is X (X always moves first).
+    const flip = Math.random() < 0.5;
+    const x = flip ? a : b;
+    const o = flip ? b : a;
+    return {
+      t: "init",
+      gameId,
+      seats: { X: x, O: o },
+      board: Array(9).fill(null),
+      turn: "X",
+      status: "playing",
+      winner: null,
+      winLine: null,
+      reason: null,
+      scores: {},
+      rematch: { me: false, opp: false },
+    };
+  }
+
+  function startGame(opponentProfile) {
+    const game = freshGame(rand(), { id: state.profile.id, name: displayName(state.profile) }, { id: opponentProfile.id, name: opponentProfile.name });
+    state.game = game;
+    state.mqtt.subscribe(T.game(game.gameId));
+    enterGame();
+    safePublish(T.game(game.gameId), JSON.stringify(game));
+    setInGame(true);
+  }
+
+  function handleGame(payload) {
+    let m;
+    try { m = JSON.parse(payload); } catch { return; }
+
+    if (m.t === "init") {
+      state.mqtt.subscribe(T.game(m.gameId));
+      state.game = {
+        ...m,
+        rematch: { me: false, opp: false },
+      };
+      setInGame(true);
+      enterGame();
+    } else if (m.t === "state") {
+      const g = state.game;
+      if (!g || g.gameId !== m.gameId) return;
+      g.board = m.board;
+      g.turn = m.turn;
+      g.status = m.status;
+      g.winner = m.winner;
+      g.winLine = m.winLine;
+      g.reason = m.reason;
+      g.scores = m.scores;
+      renderGame();
+    } else if (m.t === "rematch") {
+      const g = state.game;
+      if (!g || g.gameId !== m.gameId || g.status !== "over") return;
+      g.rematch.opp = true;
+      maybeStartRematch();
+    } else if (m.t === "leave") {
+      const g = state.game;
+      if (!g || g.gameId !== m.gameId) return;
+      if (g.status === "playing" && opponentOf(g).id === m.by) {
+        forfeitGame("forfeit");
+      } else {
+        toast("👋 Your opponent went back to the lobby.");
+        exitGame();
+      }
+    }
+  }
+
+  function publishGameState() {
+    const g = state.game;
+    safePublish(T.game(g.gameId), JSON.stringify({
+      t: "state",
+      gameId: g.gameId,
+      board: g.board,
+      turn: g.turn,
+      status: g.status,
+      winner: g.winner,
+      winLine: g.winLine,
+      reason: g.reason,
+      scores: g.scores,
+    }));
+  }
+
+  function checkWin(board) {
+    for (const line of WIN_LINES) {
+      const [a, b, c] = line;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) return line;
+    }
+    return null;
+  }
+
+  function forfeitGame(reason) {
+    const g = state.game;
+    g.status = "over";
+    g.winner = seatOf(g);
+    g.winLine = null;
+    g.reason = reason;
+    g.scores[state.profile.id] = (g.scores[state.profile.id] || 0) + 1;
+    publishGameState();
+    setInGame(false);
+    renderGame();
+  }
+
+  // ---------- game UI ----------
   function buildBoard() {
     const board = $("board");
     board.innerHTML = "";
@@ -270,17 +476,47 @@
       cell.addEventListener("click", () => {
         const g = state.game;
         if (!g || g.status !== "playing") return;
-        if (g.turn !== g.youSeat) return toast("⏳ Not your turn!");
+        if (g.turn !== seatOf(g)) return toast("⏳ Not your turn!");
         if (g.board[i]) return;
-        state.socket.emit("game:move", { gameId: g.gameId, index: i });
+        doMove(i);
       });
       board.appendChild(cell);
       state.boardButtons.push(cell);
     }
   }
 
-  function enterGame(view) {
-    state.game = view;
+  function doMove(index) {
+    const g = state.game;
+    const sym = seatOf(g);
+    g.board[index] = sym;
+    const line = checkWin(g.board);
+    if (line) {
+      g.status = "over";
+      g.winner = sym;
+      g.winLine = line;
+      g.reason = "win";
+      g.scores[g.seats[sym].id] = (g.scores[g.seats[sym].id] || 0) + 1;
+      publishGameState();
+      setInGame(false);
+      renderGame();
+      return;
+    }
+    if (g.board.every(Boolean)) {
+      g.status = "over";
+      g.winner = null;
+      g.winLine = null;
+      g.reason = "draw";
+      publishGameState();
+      setInGame(false);
+      renderGame();
+      return;
+    }
+    g.turn = g.turn === "X" ? "O" : "X";
+    publishGameState();
+    renderGame();
+  }
+
+  function enterGame() {
     state.rematchVote = false;
     buildBoard();
     renderGame();
@@ -300,29 +536,31 @@
   function renderGame() {
     const g = state.game;
     if (!g) return;
+    const mySym = seatOf(g);
+    const opp = opponentOf(g);
 
-    paintAvatar($("score-me-avatar"), state.profile);
-    paintAvatar($("score-opp-avatar"), g.opponent.profile);
-    $("score-me-name").textContent = state.profile.firstName || "You";
-    $("score-opp-name").textContent = fullName(g.opponent.profile);
-    $("score-me-symbol").textContent = g.yourSymbol;
-    $("score-opp-symbol").textContent = g.opponent.symbol;
-    $("score-me-symbol").classList.toggle("x", g.yourSymbol === "X");
-    $("score-me-symbol").classList.toggle("o", g.yourSymbol === "O");
-    $("score-opp-symbol").classList.toggle("x", g.opponent.symbol === "X");
-    $("score-opp-symbol").classList.toggle("o", g.opponent.symbol === "O");
-    $("score-me-points").textContent = g.scores.you;
-    $("score-opp-points").textContent = g.scores.opponent;
+    paintAvatar($("score-me-avatar"), { id: state.profile.id, name: displayName(state.profile) });
+    paintAvatar($("score-opp-avatar"), opp);
+    $("score-me-name").textContent = displayName(state.profile);
+    $("score-opp-name").textContent = displayName(opp);
+    $("score-me-symbol").textContent = mySym;
+    $("score-opp-symbol").textContent = mySym === "X" ? "O" : "X";
+    $("score-me-symbol").classList.toggle("x", mySym === "X");
+    $("score-me-symbol").classList.toggle("o", mySym === "O");
+    $("score-opp-symbol").classList.toggle("x", mySym === "O");
+    $("score-opp-symbol").classList.toggle("o", mySym === "X");
+    $("score-me-points").textContent = g.scores[state.profile.id] || 0;
+    $("score-opp-points").textContent = g.scores[opp.id] || 0;
 
-    $("score-me-name").parentElement.classList.toggle("thinking", g.status === "playing" && g.turn === g.youSeat);
-    $("score-opp-name").parentElement.classList.toggle("thinking", g.status === "playing" && g.turn !== g.youSeat);
+    $("score-me-name").parentElement.classList.toggle("thinking", g.status === "playing" && g.turn === mySym);
+    $("score-opp-name").parentElement.classList.toggle("thinking", g.status === "playing" && g.turn !== mySym);
 
     g.board.forEach((val, i) => {
       const cell = state.boardButtons[i];
       cell.textContent = val || "";
       cell.className = "cell";
       if (val) cell.classList.add(val.toLowerCase());
-      cell.disabled = !!val || g.status !== "playing" || g.turn !== g.youSeat;
+      cell.disabled = !!val || g.status !== "playing" || g.turn !== mySym;
     });
     if (g.winLine) g.winLine.forEach((i) => state.boardButtons[i].classList.add("win"));
 
@@ -332,18 +570,20 @@
 
   function renderTurnBanner(g) {
     const banner = $("turn-banner");
-    banner.classList.toggle("mine", g.status === "playing" && g.turn === g.youSeat);
+    const mySym = seatOf(g);
+    banner.classList.toggle("mine", g.status === "playing" && g.turn === mySym);
     if (g.status === "playing") {
-      banner.textContent = g.turn === g.youSeat ? "Your turn! 🍭" : `${fullName(g.opponent.profile)}'s turn…`;
+      banner.textContent = g.turn === mySym ? "Your turn! 🍭" : `${displayName(opponentOf(g))}'s turn…`;
     } else if (g.reason === "draw") {
       banner.textContent = "It's a draw! 🤝";
     } else {
-      banner.textContent = g.winner === g.youSeat ? "You win! 🎉" : `${fullName(g.opponent.profile)} wins!`;
+      banner.textContent = g.winner === mySym ? "You win! 🎉" : `${displayName(opponentOf(g))} wins!`;
     }
   }
 
   function renderWinOverlay(g) {
     const rematchBtn = $("rematch-btn");
+    const mySym = seatOf(g);
     if (g.status === "playing") {
       rematchBtn.classList.add("hidden");
       hideWinOverlay();
@@ -351,34 +591,28 @@
     }
 
     rematchBtn.classList.remove("hidden");
-    if (g.reason === "draw") {
-      rematchBtn.textContent = "Rematch 🔁";
-      rematchBtn.disabled = false;
-      return;
-    }
-    if (g.winner === g.youSeat) {
-      rematchBtn.textContent = "Rematch 🔁";
-      rematchBtn.disabled = false;
+    rematchBtn.disabled = false;
+    if (g.rematch && (g.rematch.me || g.rematch.opp)) {
+      rematchBtn.textContent = "Waiting for your rematch…";
     } else {
-      rematchBtn.textContent = state.rematchVote ? "Waiting for your rematch…" : "Rematch 🔁";
-      rematchBtn.disabled = false;
+      rematchBtn.textContent = "Rematch 🔁";
     }
 
     if (g.reason === "disconnect" || g.reason === "forfeit") {
-      $("win-emoji").textContent = g.winner === g.youSeat ? "🏆" : "😵";
-      $("win-title").textContent = g.winner === g.youSeat ? "You win!" : "Opponent left";
+      $("win-emoji").textContent = g.winner === mySym ? "🏆" : "😵";
+      $("win-title").textContent = g.winner === mySym ? "You win!" : "Opponent left";
       $("win-sub").textContent =
         g.reason === "disconnect"
           ? "They disconnected."
-          : g.winner === g.youSeat
+          : g.winner === mySym
             ? "They left the game."
             : "You left — head back to the lobby.";
-      if (g.winner === g.youSeat) startConfetti();
+      if (g.winner === mySym) startConfetti();
       $("win-overlay").classList.remove("hidden");
       return;
     }
 
-    if (g.winner === g.youSeat) {
+    if (g.winner === mySym) {
       $("win-emoji").textContent = "🎉";
       $("win-title").textContent = "You win!";
       $("win-sub").textContent = "Sweet victory 🍓";
@@ -386,7 +620,7 @@
     } else {
       $("win-emoji").textContent = "🍂";
       $("win-title").textContent = "So close!";
-      $("win-sub").textContent = `${fullName(g.opponent.profile)} takes this one. Rematch?`;
+      $("win-sub").textContent = `${displayName(opponentOf(g))} takes this one. Rematch?`;
     }
     $("win-overlay").classList.remove("hidden");
   }
@@ -396,19 +630,42 @@
   }
 
   $("back-btn").addEventListener("click", () => {
-    if (state.game) state.socket.emit("game:leave", { gameId: state.game.gameId });
+    const g = state.game;
+    if (g) {
+      safePublish(T.game(g.gameId), JSON.stringify({ t: "leave", gameId: g.gameId, by: state.profile.id }));
+      setInGame(false);
+    }
     exitGame();
   });
 
   $("rematch-btn").addEventListener("click", () => {
     const g = state.game;
-    if (!g) return;
-    state.rematchVote = true;
+    if (!g || g.status !== "over") return;
+    g.rematch.me = true;
     $("rematch-btn").textContent = "Waiting…";
     $("rematch-btn").disabled = true;
     hideWinOverlay();
-    state.socket.emit("game:rematch", { gameId: g.gameId });
+    safePublish(T.game(g.gameId), JSON.stringify({ t: "rematch", gameId: g.gameId, by: state.profile.id }));
+    maybeStartRematch();
   });
+
+  function maybeStartRematch() {
+    const g = state.game;
+    if (!g || g.status !== "over" || !g.rematch.me || !g.rematch.opp) return;
+    g.rematch = { me: false, opp: false };
+    const oldX = g.seats.X;
+    g.seats = { X: g.seats.O, O: oldX }; // swap so the other player goes first
+    g.board = Array(9).fill(null);
+    g.turn = "X";
+    g.status = "playing";
+    g.winner = null;
+    g.winLine = null;
+    g.reason = null;
+    state.rematchVote = false;
+    safePublish(T.game(g.gameId), JSON.stringify({ ...g }));
+    setInGame(true);
+    renderGame();
+  }
 
   $("logout-btn").addEventListener("click", logout);
 
@@ -466,28 +723,14 @@
   // ---------- boot ----------
   function boot() {
     buildBoard();
-    connect();
-
-    fetch("/api/config")
-      .then((r) => r.json())
-      .then(({ configured }) => {
-        const hint = $("quick-hint");
-        if (configured) {
-          $("config-hint").classList.add("hidden");
-          hint.innerHTML =
-            "No ID yet? Send <b>/start</b> to <b>@Gojobot1_bot</b> — it replies with your ID.";
-        } else {
-          $("config-hint").classList.remove("hidden");
-          hint.textContent = "Any number works — your nickname shows on your profile.";
-        }
-      })
-      .catch(() => toast("⚠️ Could not reach the server."));
-
-    if (state.token) {
-      // The socket will auth on connect; stay on login until auth:ok.
-    } else {
-      showScreen("login");
+    const saved = localStorage.getItem(PROFILE_KEY);
+    if (saved) {
+      try {
+        startSession(JSON.parse(saved));
+        return;
+      } catch { /* fall through to login */ }
     }
+    showScreen("login");
   }
 
   boot();
