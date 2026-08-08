@@ -214,7 +214,7 @@
       state.mqtt.subscribe(T.req(profile.id));
       publishPresenceNow("");
       startHeartbeat();
-      renderHome();
+      renderUsers();
       showScreen("home");
     });
 
