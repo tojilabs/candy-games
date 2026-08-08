@@ -67,36 +67,6 @@
   }
 
   // ---------- login ----------
-  function injectTelegramWidget(botUsername) {
-    const container = $("telegram-widget");
-    container.innerHTML = "";
-    const s = document.createElement("script");
-    s.async = true;
-    s.src = "https://telegram.org/js/telegram-widget.js?22";
-    s.setAttribute("data-telegram-login", botUsername);
-    s.setAttribute("data-size", "large");
-    s.setAttribute("data-radius", "16");
-    s.setAttribute("data-userpic", "true");
-    s.setAttribute("data-onauth", "onTelegramAuth");
-    container.appendChild(s);
-  }
-
-  window.onTelegramAuth = (user) => {
-    fetch("/api/auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
-    })
-      .then((r) => (r.ok ? r.json() : r.json().then((j) => Promise.reject(j.error || "Auth failed"))))
-      .then(({ token, profile }) => {
-        state.token = token;
-        state.profile = profile;
-        localStorage.setItem(TOKEN_KEY, token);
-        state.socket.emit("auth", { token });
-      })
-      .catch((err) => toast(`⚠️ ${err}`));
-  };
-
   const quickForm = $("quick-login");
   const quickInput = $("quick-id");
   const quickError = $("quick-error");
@@ -499,12 +469,8 @@
 
     fetch("/api/config")
       .then((r) => r.json())
-      .then(({ botUsername, configured }) => {
-        if (!configured) {
-          $("config-hint").classList.remove("hidden");
-          return;
-        }
-        injectTelegramWidget(botUsername);
+      .then(({ configured }) => {
+        if (!configured) $("config-hint").classList.remove("hidden");
       })
       .catch(() => toast("⚠️ Could not reach the server."));
 

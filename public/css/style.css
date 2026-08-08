@@ -127,8 +127,6 @@ body { overflow-x: hidden; }
 
 .tagline { margin-top: 4px; color: var(--ink-soft); font-weight: 500; }
 
-.telegram-widget { margin-top: 26px; display: flex; justify-content: center; }
-
 .config-hint {
   margin-top: 16px;
   padding: 12px 14px;
@@ -144,26 +142,7 @@ body { overflow-x: hidden; }
 .fine { margin-top: 22px; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
 
 /* ---------- quick ID login ---------- */
-.login-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 22px 0 14px;
-  color: var(--ink-soft);
-  font-size: 12.5px;
-  font-weight: 600;
-}
-.login-divider::before,
-.login-divider::after {
-  content: "";
-  flex: 1;
-  height: 1.5px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, transparent, #e6cfe3);
-}
-.login-divider::after { background: linear-gradient(90deg, #e6cfe3, transparent); }
-
-.quick-login { display: flex; flex-direction: column; gap: 10px; }
+.quick-login { display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }
 
 .quick-login input {
   font-family: inherit;

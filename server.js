@@ -34,41 +34,6 @@ const requests = new Map(); // requestId    -> { from, to, createdAt }
 
 const otherSeat = (seat) => (seat === 0 ? 1 : 0);
 
-function buildProfile(d) {
-  return {
-    id: String(d.id),
-    firstName: String(d.first_name || "").trim(),
-    lastName: String(d.last_name || "").trim(),
-    username: String(d.username || "").trim(),
-    photo: String(d.photo_url || ""),
-  };
-}
-
-// --- Telegram login verification (HMAC-SHA256 with the bot token) ----------
-function verifyTelegramAuth(data) {
-  if (!data || typeof data !== "object") return null;
-  const { hash, auth_date } = data;
-  if (!hash || !auth_date) return null;
-  const ageSec = Math.floor(Date.now() / 1000) - Number(auth_date);
-  if (Number.isNaN(ageSec) || ageSec < 0 || ageSec > 24 * 3600) return null;
-
-  const secret = crypto.createHash("sha256").update(config.botToken).digest();
-  const checkString = Object.keys(data)
-    .filter((k) => k !== "hash")
-    .sort()
-    .map((k) => `${k}=${data[k]}`)
-    .join("\n");
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(checkString)
-    .digest("hex");
-
-  const a = Buffer.from(String(hash));
-  const b = Buffer.from(expected);
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
-  return buildProfile(data);
-}
-
 // --- Telegram Bot API helpers ----------------------------------------------
 const TG_API = `https://api.telegram.org/bot${config.botToken}`;
 const botConfigured = () => !/YOUR_|CHANGE_ME/.test(config.botToken);
@@ -112,18 +77,8 @@ app.get("/api/config", (_req, res) => {
   });
 });
 
-app.post("/api/auth", (req, res) => {
-  const profile = verifyTelegramAuth(req.body);
-  if (!profile) {
-    return res.status(401).json({ error: "Telegram signature check failed. Reopen via the Telegram login widget." });
-  }
-  const token = crypto.randomBytes(24).toString("hex");
-  sessions.set(token, { telegramId: profile.id, profile, createdAt: Date.now() });
-  res.json({ token, profile });
-});
-
 // Quick login: enter your numeric Telegram ID, server looks up your real
-// name + profile pic via the bot (no widget needed).
+// name + profile pic via the bot.
 app.post("/api/auth/id", async (req, res) => {
   const chatId = String(req.body?.chatId || "").trim();
   if (!/^\d{4,}$/.test(chatId)) {

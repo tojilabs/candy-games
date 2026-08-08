@@ -29,11 +29,6 @@
         <div class="logo-bubble">🍬</div>
         <h1 class="title">Candy Games</h1>
         <p class="tagline">Mini games for the gang 💖</p>
-        <div id="telegram-widget" class="telegram-widget"></div>
-        <div id="config-hint" class="config-hint hidden">
-          ⚠️ Set your bot username &amp; token in <code>config.js</code> (or env vars) first, then restart.
-        </div>
-        <div class="login-divider"><span>or log in with your ID</span></div>
         <form id="quick-login" class="quick-login" autocomplete="off">
           <input id="quick-id" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Paste your Telegram ID" />
           <button id="quick-btn" type="submit" class="pill">Log in 🍭</button>
@@ -42,7 +37,10 @@
             No ID yet? Send <b>/start</b> to <b>@Gojobot1_bot</b> — it replies with your ID.
           </p>
         </form>
-        <p class="fine">Log in with Telegram — your name &amp; profile pic become your profile automatically.</p>
+        <div id="config-hint" class="config-hint hidden">
+          ⚠️ Set the bot username &amp; token (env vars <code>BOT_USERNAME</code> / <code>BOT_TOKEN</code>) first, then restart.
+        </div>
+        <p class="fine">Log in with your Telegram ID — your name &amp; profile pic are pulled automatically.</p>
       </div>
     </section>
 
