@@ -140,6 +140,7 @@ body { overflow-x: hidden; }
 .config-hint code { background: rgba(255,255,255,0.7); padding: 1px 6px; border-radius: 6px; font-size: 12px; }
 
 .fine { margin-top: 22px; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+.build-tag { margin-top: 6px; font-size: 11px; opacity: 0.55; }
 
 /* ---------- quick ID login ---------- */
 .quick-login { display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }

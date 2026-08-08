@@ -4,6 +4,21 @@
 (() => {
   "use strict";
 
+  const APP_VERSION = "3";
+  window.__APP_VERSION = APP_VERSION;
+  window.document.title = "Candy Games 🍬 · v" + APP_VERSION;
+
+  // Surface any runtime error on screen so failures are never silent.
+  window.addEventListener("error", (e) => {
+    const m = (e && e.message) || "Unknown error";
+    setConnStatus("Error: " + m + (e && e.filename ? " (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : ""), "error");
+    toast("⚠️ " + m);
+  });
+  window.addEventListener("unhandledrejection", (e) => {
+    const r = e && e.reason;
+    setConnStatus("Error: " + (r ? r.message || String(r) : "async error"), "error");
+  });
+
   const $ = (id) => document.getElementById(id);
   const screens = { login: $("screen-login"), home: $("screen-home"), game: $("screen-game") };
   const PROFILE_KEY = "candygames.profile";
@@ -133,6 +148,13 @@
     };
     localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
     startSession(profile);
+  });
+
+  // Belt-and-braces: also catch a direct button click in case the form
+  // submit event is swallowed by anything.
+  $("quick-btn").addEventListener("click", (e) => {
+    e.preventDefault();
+    quickForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   });
 
   function logout() {
