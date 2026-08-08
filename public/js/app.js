@@ -84,11 +84,12 @@
       showQuickError("That doesn't look like a Telegram ID — it should be a number.");
       return;
     }
+    const nickname = $("quick-nick").value.trim();
     $("quick-btn").disabled = true;
     fetch("/api/auth/id", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatId }),
+      body: JSON.stringify({ chatId, nickname }),
     })
       .then((r) => r.json().then((j) => ({ ok: r.ok, ...j })))
       .then(({ ok, token, profile, error }) => {
@@ -470,7 +471,15 @@
     fetch("/api/config")
       .then((r) => r.json())
       .then(({ configured }) => {
-        if (!configured) $("config-hint").classList.remove("hidden");
+        const hint = $("quick-hint");
+        if (configured) {
+          $("config-hint").classList.add("hidden");
+          hint.innerHTML =
+            "No ID yet? Send <b>/start</b> to <b>@Gojobot1_bot</b> — it replies with your ID.";
+        } else {
+          $("config-hint").classList.remove("hidden");
+          hint.textContent = "Any number works — your nickname shows on your profile.";
+        }
       })
       .catch(() => toast("⚠️ Could not reach the server."));
 

@@ -77,18 +77,25 @@ app.get("/api/config", (_req, res) => {
   });
 });
 
-// Quick login: enter your numeric Telegram ID, server looks up your real
-// name + profile pic via the bot.
+// Quick login: enter a numeric Telegram ID + nickname. When a bot token is
+// configured, the real name & profile pic are pulled via the bot; otherwise
+// (or if the lookup fails) the nickname is used. The bot is optional.
 app.post("/api/auth/id", async (req, res) => {
   const chatId = String(req.body?.chatId || "").trim();
+  const nickname = String(req.body?.nickname || "").trim().slice(0, 30);
   if (!/^\d{4,}$/.test(chatId)) {
     return res.status(400).json({ error: "That doesn't look like a Telegram ID. It should be a number." });
   }
-  const profile = await profileFromChatId(chatId);
+
+  let profile = await profileFromChatId(chatId);
   if (!profile) {
-    return res.status(404).json({
-      error: "No user found with that ID. Open @Gojobot1_bot and press Start first, then try again.",
-    });
+    profile = {
+      id: chatId,
+      firstName: nickname || `Friend ${chatId.slice(-4)}`,
+      lastName: "",
+      username: "",
+      photo: "",
+    };
   }
   const token = crypto.randomBytes(24).toString("hex");
   sessions.set(token, { telegramId: profile.id, profile, createdAt: Date.now() });
