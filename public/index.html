@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffe6f2" />
+  <title>Candy Games 🍬</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍭</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="blobs" aria-hidden="true">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+    <span class="floaty f1">🍬</span>
+    <span class="floaty f2">🍭</span>
+    <span class="floaty f3">🍡</span>
+    <span class="floaty f4">🧁</span>
+  </div>
+
+  <main class="app">
+    <!-- ============ LOGIN ============ -->
+    <section id="screen-login" class="screen active">
+      <div class="card center-card">
+        <div class="logo-bubble">🍬</div>
+        <h1 class="title">Candy Games</h1>
+        <p class="tagline">Mini games for the gang 💖</p>
+        <div id="telegram-widget" class="telegram-widget"></div>
+        <div id="config-hint" class="config-hint hidden">
+          ⚠️ Set your bot username &amp; token in <code>config.js</code> (or env vars) first, then restart.
+        </div>
+        <div class="login-divider"><span>or log in with your ID</span></div>
+        <form id="quick-login" class="quick-login" autocomplete="off">
+          <input id="quick-id" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Paste your Telegram ID" />
+          <button id="quick-btn" type="submit" class="pill">Log in 🍭</button>
+          <p id="quick-error" class="quick-error hidden"></p>
+          <p class="quick-hint">
+            No ID yet? Send <b>/start</b> to <b>@Gojobot1_bot</b> — it replies with your ID.
+          </p>
+        </form>
+        <p class="fine">Log in with Telegram — your name &amp; profile pic become your profile automatically.</p>
+      </div>
+    </section>
+
+    <!-- ============ HOME ============ -->
+    <section id="screen-home" class="screen">
+      <header class="topbar">
+        <div class="me">
+          <div id="me-avatar" class="avatar lg"></div>
+          <div class="me-text">
+            <div class="greeting">Hey, <span id="me-name">friend</span>!</div>
+            <div id="online-count" class="online-count">🐻 checking who's here…</div>
+          </div>
+        </div>
+        <button id="logout-btn" class="pill ghost sm">Log out</button>
+      </header>
+
+      <div class="section-head">
+        <h2 class="section-title">Who's online</h2>
+        <span id="online-pill" class="online-pill"><span class="dot"></span><span id="online-num">0</span> online</span>
+      </div>
+
+      <ul id="user-list" class="user-list"></ul>
+      <div id="empty-state" class="empty hidden">
+        <div class="empty-emoji">🍯</div>
+        <p>Nobody's here yet.<br />Share the link with your Telegram gang!</p>
+      </div>
+
+      <div id="request-banner" class="request-banner hidden" role="alert">
+        <div id="rb-avatar" class="avatar"></div>
+        <div class="rb-text">
+          <strong id="rb-name"></strong>
+          <span>wants to play Tic-Tac-Toe! 🎮</span>
+        </div>
+        <button id="rb-accept" class="pill accept">Accept</button>
+        <button id="rb-decline" class="pill decline">Decline</button>
+      </div>
+    </section>
+
+    <!-- ============ GAME ============ -->
+    <section id="screen-game" class="screen">
+      <header class="game-topbar">
+        <button id="back-btn" class="pill ghost sm">← Lobby</button>
+        <div class="game-title">Tic · Tac · Toe 🍬</div>
+      </header>
+
+      <div class="scoreboard">
+        <div class="score-card">
+          <div class="score-avatar">
+            <div id="score-me-avatar" class="avatar sm"></div>
+            <span id="score-me-symbol" class="symbol-badge x">X</span>
+          </div>
+          <span id="score-me-name" class="score-name">You</span>
+          <span id="score-me-points" class="score-points">0</span>
+        </div>
+        <div class="vs">VS</div>
+        <div class="score-card">
+          <div class="score-avatar">
+            <div id="score-opp-avatar" class="avatar sm"></div>
+            <span id="score-opp-symbol" class="symbol-badge o">O</span>
+          </div>
+          <span id="score-opp-name" class="score-name">Opponent</span>
+          <span id="score-opp-points" class="score-points">0</span>
+        </div>
+      </div>
+
+      <div id="turn-banner" class="turn-banner">Your turn! 🍭</div>
+
+      <div id="board" class="board"></div>
+
+      <div class="game-actions">
+        <button id="rematch-btn" class="pill rematch hidden">Rematch 🔁</button>
+      </div>
+
+      <div id="win-overlay" class="win-overlay hidden">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="win-card">
+          <div class="win-emoji" id="win-emoji">🎉</div>
+          <div class="win-title" id="win-title">You win!</div>
+          <div class="win-sub" id="win-sub">Sweet victory 🍓</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toasts" class="toasts"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

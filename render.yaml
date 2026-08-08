@@ -1,0 +1,13 @@
+# render.yaml — one-click deploy on Render (https://render.com).
+# Set BOT_USERNAME and BOT_TOKEN as environment variables on the service.
+services:
+  - type: web
+    name: candy-games
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/config
+    envVars:
+      - key: NODE_VERSION
+        value: 22
