@@ -260,6 +260,37 @@
       box-shadow: 0 6px 16px rgba(167, 139, 250, 0.4);
     }
 
+    /* ---------- mode cards ---------- */
+    .modes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+    .mode-card {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 20px 14px;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border-radius: 22px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      color: var(--ink);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .mode-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .mode-card:active { transform: translateY(0) scale(0.97); }
+    .mode-emoji { font-size: 34px; }
+    .mode-title { font-size: 16px; font-weight: 700; }
+    .mode-sub { font-size: 12px; color: var(--ink-soft); line-height: 1.4; }
+
     /* ---------- section head ---------- */
     .section-head {
       display: flex;
@@ -659,6 +690,19 @@
         <button id="logout-btn" class="pill ghost sm">خروج</button>
       </header>
 
+      <div class="modes">
+        <button id="mode-ai" class="mode-card">
+          <span class="mode-emoji">🤖</span>
+          <span class="mode-title">العب ضد الذكاء</span>
+          <span class="mode-sub">تحدَّ الحاسوب في إكس أو</span>
+        </button>
+        <button id="mode-pvp" class="mode-card">
+          <span class="mode-emoji">👥</span>
+          <span class="mode-title">العب 1v1</span>
+          <span class="mode-sub">مع من هم متصلون الآن</span>
+        </button>
+      </div>
+
       <div class="section-head">
         <h2 class="section-title">المتواجدون الآن</h2>
         <span id="online-pill" class="online-pill"><span class="dot"></span><span id="online-num">0</span> متصل</span>
@@ -818,6 +862,7 @@
         requestQueue: [],
         pendingRequest: null, // { reqId, to, timer }
         game: null,
+        mode: null, // "pvp" | "ai"
         boardButtons: [],
         heartbeatTimer: null,
         pruneTimer: null,
@@ -1210,11 +1255,97 @@
 
       function startGame(opponentProfile) {
         const game = freshGame(rand(), { id: state.profile.id, name: displayName(state.profile) }, { id: opponentProfile.id, name: opponentProfile.name });
+        state.mode = "pvp";
         state.game = game;
         state.mqtt.subscribe(T.game(game.gameId));
         enterGame();
         safePublish(T.game(game.gameId), JSON.stringify(game));
         setInGame(true);
+      }
+
+      // ---------- AI mode ----------
+      function startAiGame() {
+        if (state.game && state.game.status === "playing") return toast("⚠️ أنهِ اللعبة الحالية أولاً.");
+        state.mode = "ai";
+        const ai = { id: "ai_" + rand(), name: "الذكاء الاصطناعي" };
+        const game = freshGame(rand(), { id: state.profile.id, name: displayName(state.profile) }, ai);
+        state.game = game;
+        enterGame();
+        setInGame(true);
+        // If the AI is X, it moves first.
+        if (seatOf(game) === "O") scheduleAiMove();
+      }
+
+      function scheduleAiMove() {
+        const g = state.game;
+        const aiSym = seatOf(g) === "X" ? "O" : "X";
+        setTimeout(() => {
+          if (!state.game || state.game !== g || g.status !== "playing") return;
+          if (g.turn !== aiSym) return;
+          doMove(aiBestMove(g.board, aiSym));
+        }, 450 + Math.random() * 450);
+      }
+
+      function aiBestMove(board, aiSym) {
+        // Mostly play the minimax best move, but sometimes blunder on purpose.
+        if (Math.random() < 0.25) {
+          const open = [];
+          for (let i = 0; i < 9; i++) if (!board[i]) open.push(i);
+          return open[(Math.random() * open.length) | 0];
+        }
+        const human = aiSym === "X" ? "O" : "X";
+        let best = -Infinity;
+        let moves = [];
+        for (let i = 0; i < 9; i++) {
+          if (board[i]) continue;
+          board[i] = aiSym;
+          const score = minimax(board, 0, false, aiSym, human);
+          board[i] = null;
+          if (score > best) { best = score; moves = [i]; }
+          else if (score === best) moves.push(i);
+        }
+        return moves[(Math.random() * moves.length) | 0];
+      }
+
+      function minimax(board, depth, maximizing, aiSym, human) {
+        const win = checkWin(board);
+        if (win) return board[win[0]] === aiSym ? 10 - depth : depth - 10;
+        if (board.every(Boolean)) return 0;
+        if (maximizing) {
+          let best = -Infinity;
+          for (let i = 0; i < 9; i++) {
+            if (board[i]) continue;
+            board[i] = aiSym;
+            best = Math.max(best, minimax(board, depth + 1, false, aiSym, human));
+            board[i] = null;
+          }
+          return best;
+        }
+        let best = Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (board[i]) continue;
+          board[i] = human;
+          best = Math.min(best, minimax(board, depth + 1, true, aiSym, human));
+          board[i] = null;
+        }
+        return best;
+      }
+
+      function resetAiGame() {
+        const g = state.game;
+        const oldX = g.seats.X;
+        g.seats = { X: g.seats.O, O: oldX }; // swap so the other side goes first
+        g.board = Array(9).fill(null);
+        g.turn = "X";
+        g.status = "playing";
+        g.winner = null;
+        g.winLine = null;
+        g.reason = null;
+        state.rematchVote = false;
+        renderGame();
+        setInGame(true);
+        const aiSym = seatOf(g) === "X" ? "O" : "X";
+        if (g.turn === aiSym) scheduleAiMove();
       }
 
       function handleGame(payload) {
@@ -1259,6 +1390,7 @@
 
       function publishGameState() {
         const g = state.game;
+        if (state.mode === "ai") return; // AI games are local only
         safePublish(T.game(g.gameId), JSON.stringify({
           t: "state",
           gameId: g.gameId,
@@ -1313,7 +1445,7 @@
 
       function doMove(index) {
         const g = state.game;
-        const sym = seatOf(g);
+        const sym = g.turn;
         g.board[index] = sym;
         const line = checkWin(g.board);
         if (line) {
@@ -1340,6 +1472,10 @@
         g.turn = g.turn === "X" ? "O" : "X";
         publishGameState();
         renderGame();
+        if (state.mode === "ai" && g.status === "playing") {
+          const aiSym = seatOf(g) === "X" ? "O" : "X";
+          if (g.turn === aiSym) scheduleAiMove();
+        }
       }
 
       function enterGame() {
@@ -1351,6 +1487,7 @@
 
       function exitGame() {
         state.game = null;
+        state.mode = null;
         hideWinOverlay();
         $("rematch-btn").classList.add("hidden");
         $("rematch-btn").textContent = "إعادة 🔁";
@@ -1452,7 +1589,7 @@
 
       $("back-btn").addEventListener("click", () => {
         const g = state.game;
-        if (g) {
+        if (g && state.mode !== "ai") {
           safePublish(T.game(g.gameId), JSON.stringify({ t: "leave", gameId: g.gameId, by: state.profile.id }));
           setInGame(false);
         }
@@ -1462,6 +1599,10 @@
       $("rematch-btn").addEventListener("click", () => {
         const g = state.game;
         if (!g || g.status !== "over") return;
+        if (state.mode === "ai") {
+          resetAiGame();
+          return;
+        }
         g.rematch.me = true;
         $("rematch-btn").textContent = "بانتظار الخصم…";
         $("rematch-btn").disabled = true;
@@ -1489,6 +1630,11 @@
       }
 
       $("logout-btn").addEventListener("click", logout);
+
+      $("mode-ai").addEventListener("click", startAiGame);
+      $("mode-pvp").addEventListener("click", () => {
+        $("user-list").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
 
       // ---------- confetti ----------
       let confettiRaf = null;
