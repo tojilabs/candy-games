@@ -921,6 +921,7 @@
         presenceAll: () => `cg/${ROOM}/presence/+`,
         req: (id) => `cg/${ROOM}/req/${id}`,
         game: (id) => `cg/${ROOM}/game/${id}`,
+        gameAll: () => `cg/${ROOM}/game/#`,
       };
 
       // ---------- helpers ----------
@@ -1062,6 +1063,7 @@
           setConnStatus("");
           state.mqtt.subscribe(T.presenceAll());
           state.mqtt.subscribe(T.req(profile.id));
+          state.mqtt.subscribe(T.gameAll());
           publishPresenceNow("");
           startHeartbeat();
           renderUsers();
@@ -1300,7 +1302,6 @@
         const game = freshGame(rand(), { id: state.profile.id, name: displayName(state.profile) }, { id: opponentProfile.id, name: opponentProfile.name });
         state.mode = "pvp";
         state.game = game;
-        state.mqtt.subscribe(T.game(game.gameId));
         enterGame();
         safePublish(T.game(game.gameId), JSON.stringify(game));
         setInGame(true);
@@ -1396,7 +1397,8 @@
         try { m = JSON.parse(payload); } catch { return; }
 
         if (m.t === "init") {
-          state.mqtt.subscribe(T.game(m.gameId));
+          // Ignore games we're not a player in (we're on the shared game/# topic).
+          if (m.seats.X.id !== state.profile.id && m.seats.O.id !== state.profile.id) return;
           state.game = {
             ...m,
             rematch: { me: false, opp: false },
