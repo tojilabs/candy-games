@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#ffe6f2" />
-  <title>Candy Games 🍬 · v5</title>
+  <title>ألعاب الحلويات 🍬 · v6</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍭</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
     /* style.css — Candy style design system for Candy Games 🍬 */
@@ -34,7 +34,7 @@
 
     html, body {
       height: 100%;
-      font-family: "Fredoka", "Segoe UI", system-ui, sans-serif;
+      font-family: "Baloo Bhaijaan 2", "Cairo", "Segoe UI", system-ui, sans-serif;
       color: var(--ink);
       background: linear-gradient(150deg, #ffe6f2 0%, #e7f6f4 52%, #f1eaff 100%);
       background-attachment: fixed;
@@ -130,7 +130,7 @@
 
     .title {
       font-size: 34px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.5px;
       background: linear-gradient(90deg, #ff6fa5, #a78bfa, #4ecdc4);
       -webkit-background-clip: text;
@@ -267,7 +267,7 @@
       justify-content: space-between;
       margin-bottom: 12px;
     }
-    .section-title { font-size: 20px; font-weight: 600; }
+    .section-title { font-size: 20px; font-weight: 700; }
 
     .online-pill {
       display: inline-flex;
@@ -335,6 +335,7 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
+      white-space: nowrap;
     }
     .status-tag .dot { width: 7px; height: 7px; }
     .status-tag.ingame { background: var(--purple-soft); color: #7c5cd6; }
@@ -385,7 +386,7 @@
       to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
     }
     .request-banner .avatar { width: 42px; height: 42px; }
-    .rb-text { flex: 1; min-width: 0; font-size: 13.5px; line-height: 1.3; }
+    .rb-text { flex: 1; min-width: 0; font-size: 13.5px; line-height: 1.4; }
     .rb-text strong { display: block; font-size: 15px; }
     .rb-text span { color: var(--ink-soft); }
     .request-banner .pill { padding: 9px 14px; font-size: 13px; }
@@ -399,7 +400,7 @@
     }
     .game-title {
       font-size: 17px;
-      font-weight: 600;
+      font-weight: 700;
       background: rgba(255, 255, 255, 0.65);
       padding: 8px 16px;
       border-radius: 999px;
@@ -566,7 +567,7 @@
       animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
     .win-emoji { font-size: 64px; animation: wiggle 1.4s ease-in-out infinite; }
-    .win-title { font-size: 28px; font-weight: 700; margin-top: 6px; }
+    .win-title { font-size: 28px; font-weight: 800; margin-top: 6px; }
     .win-sub { margin-top: 4px; color: var(--ink-soft); font-weight: 500; }
 
     .win-overlay .pill { margin-top: 20px; }
@@ -631,17 +632,17 @@
     <section id="screen-login" class="screen active">
       <div class="card center-card">
         <div class="logo-bubble">🍬</div>
-        <h1 class="title">Candy Games</h1>
-        <p class="tagline">Mini games for the gang 💖</p>
+        <h1 class="title">ألعاب الحلويات</h1>
+        <p class="tagline">ألعاب مصغّرة للعصابة 💖</p>
         <form id="quick-login" class="quick-login" autocomplete="off">
-          <input id="quick-nick" type="text" maxlength="24" placeholder="Your nickname" autocomplete="nickname" />
-          <button id="quick-btn" type="submit" class="pill">Log in 🍭</button>
+          <input id="quick-nick" type="text" maxlength="24" placeholder="اسمك المستعار" autocomplete="nickname" />
+          <button id="quick-btn" type="submit" class="pill">دخول 🍭</button>
           <p id="quick-error" class="quick-error hidden"></p>
           <p id="conn-status" class="conn-status hidden"></p>
-          <p class="quick-hint">No signup, no ID — just pick a name and play.</p>
+          <p class="quick-hint">بدون تسجيل وبدون ID — اختر اسماً وابدأ اللعب.</p>
         </form>
-        <p class="fine">Your name shows to whoever's online at the same time.</p>
-        <p class="fine build-tag">build v5</p>
+        <p class="fine">اسمك يظهر لمن يكون متصلاً في نفس الوقت.</p>
+        <p class="fine build-tag">build v6</p>
       </div>
     </section>
 
@@ -651,40 +652,40 @@
         <div class="me">
           <div id="me-avatar" class="avatar lg"></div>
           <div class="me-text">
-            <div class="greeting">Hey, <span id="me-name">friend</span>!</div>
-            <div id="online-count" class="online-count">🐻 checking who's here…</div>
+            <div class="greeting">أهلاً، <span id="me-name">صديقي</span>!</div>
+            <div id="online-count" class="online-count">🐻 نتحقق من الموجودين…</div>
           </div>
         </div>
-        <button id="logout-btn" class="pill ghost sm">Log out</button>
+        <button id="logout-btn" class="pill ghost sm">خروج</button>
       </header>
 
       <div class="section-head">
-        <h2 class="section-title">Who's online</h2>
-        <span id="online-pill" class="online-pill"><span class="dot"></span><span id="online-num">0</span> online</span>
+        <h2 class="section-title">المتواجدون الآن</h2>
+        <span id="online-pill" class="online-pill"><span class="dot"></span><span id="online-num">0</span> متصل</span>
       </div>
 
       <ul id="user-list" class="user-list"></ul>
       <div id="empty-state" class="empty hidden">
         <div class="empty-emoji">🍯</div>
-        <p>Nobody's here yet.<br />Share the link with your gang!</p>
+        <p>لا يوجد أحد هنا بعد.<br />شارك الرابط مع أصدقائك!</p>
       </div>
 
       <div id="request-banner" class="request-banner hidden" role="alert">
         <div id="rb-avatar" class="avatar"></div>
         <div class="rb-text">
           <strong id="rb-name"></strong>
-          <span>wants to play Tic-Tac-Toe! 🎮</span>
+          <span>يريد أن يلعب معك إكس أو! 🎮</span>
         </div>
-        <button id="rb-accept" class="pill accept">Accept</button>
-        <button id="rb-decline" class="pill decline">Decline</button>
+        <button id="rb-accept" class="pill accept">قبول</button>
+        <button id="rb-decline" class="pill decline">رفض</button>
       </div>
     </section>
 
     <!-- ============ GAME ============ -->
     <section id="screen-game" class="screen">
       <header class="game-topbar">
-        <button id="back-btn" class="pill ghost sm">← Lobby</button>
-        <div class="game-title">Tic · Tac · Toe 🍬</div>
+        <button id="back-btn" class="pill ghost sm">الرجوع</button>
+        <div class="game-title">إكس · أو 🍬</div>
       </header>
 
       <div class="scoreboard">
@@ -693,34 +694,34 @@
             <div id="score-me-avatar" class="avatar sm"></div>
             <span id="score-me-symbol" class="symbol-badge x">X</span>
           </div>
-          <span id="score-me-name" class="score-name">You</span>
+          <span id="score-me-name" class="score-name">أنت</span>
           <span id="score-me-points" class="score-points">0</span>
         </div>
-        <div class="vs">VS</div>
+        <div class="vs">ضد</div>
         <div class="score-card">
           <div class="score-avatar">
             <div id="score-opp-avatar" class="avatar sm"></div>
             <span id="score-opp-symbol" class="symbol-badge o">O</span>
           </div>
-          <span id="score-opp-name" class="score-name">Opponent</span>
+          <span id="score-opp-name" class="score-name">الخصم</span>
           <span id="score-opp-points" class="score-points">0</span>
         </div>
       </div>
 
-      <div id="turn-banner" class="turn-banner">Your turn! 🍭</div>
+      <div id="turn-banner" class="turn-banner">دورك! 🍭</div>
 
       <div id="board" class="board"></div>
 
       <div class="game-actions">
-        <button id="rematch-btn" class="pill rematch hidden">Rematch 🔁</button>
+        <button id="rematch-btn" class="pill rematch hidden">إعادة 🔁</button>
       </div>
 
       <div id="win-overlay" class="win-overlay hidden">
         <canvas id="confetti-canvas"></canvas>
         <div class="win-card">
           <div class="win-emoji" id="win-emoji">🎉</div>
-          <div class="win-title" id="win-title">You win!</div>
-          <div class="win-sub" id="win-sub">Sweet victory 🍓</div>
+          <div class="win-title" id="win-title">فزت!</div>
+          <div class="win-sub" id="win-sub">فوز جميل 🍓</div>
         </div>
       </div>
     </section>
@@ -756,25 +757,25 @@
   </script>
 
   <script>
-    // app.js — Candy Games (single-file / GitHub Pages build).
+    // app.js — Candy Games (single-file / GitHub Pages build) — Arabic UI.
     // Realtime works over a public MQTT broker (no backend needed): presence,
     // game requests, and the 1v1 Tic-Tac-Toe engine all run in the browser.
     (() => {
       "use strict";
 
-      const APP_VERSION = "5";
+      const APP_VERSION = "6";
       window.__APP_VERSION = APP_VERSION;
-      window.document.title = "Candy Games 🍬 · v" + APP_VERSION;
+      window.document.title = "ألعاب الحلويات 🍬 · v" + APP_VERSION;
 
       // Surface any runtime error on screen so failures are never silent.
       window.addEventListener("error", (e) => {
-        const m = (e && e.message) || "Unknown error";
-        setConnStatus("Error: " + m + (e && e.filename ? " (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : ""), "error");
+        const m = (e && e.message) || "خطأ غير معروف";
+        setConnStatus("خطأ: " + m + (e && e.filename ? " (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : ""), "error");
         toast("⚠️ " + m);
       });
       window.addEventListener("unhandledrejection", (e) => {
         const r = e && e.reason;
-        setConnStatus("Error: " + (r ? r.message || String(r) : "async error"), "error");
+        setConnStatus("خطأ: " + (r ? r.message || String(r) : "خطأ غير متزامن"), "error");
       });
 
       const $ = (id) => document.getElementById(id);
@@ -825,7 +826,7 @@
 
       const rand = () => Math.random().toString(36).slice(2, 10);
       const colorFor = (id) => AVATAR_COLORS[Number(id) % AVATAR_COLORS.length];
-      const displayName = (p) => p.name || p.nickname || `Friend ${String(p.id).slice(-4)}`;
+      const displayName = (p) => p.name || p.nickname || `صديق ${String(p.id).slice(-4)}`;
 
       const T = {
         presence: (id) => `cg/${ROOM}/presence/${id}`,
@@ -897,7 +898,7 @@
         quickError.classList.add("hidden");
         const nickname = quickNick.value.trim();
         if (!nickname) {
-          showQuickError("Pick a nickname first! 🍭");
+          showQuickError("اختر اسماً مستعاراً أولاً! 🍭");
           quickNick.focus();
           return;
         }
@@ -938,17 +939,17 @@
       function startSession(profile) {
         state.profile = profile;
         state.sessionId = `${profile.id}_${rand()}`;
-        setConnStatus("Connecting to the candy network… 🍬", "info");
+        setConnStatus("جارٍ الاتصال بشبكة الحلويات… 🍬", "info");
         tryBroker(profile, 0);
       }
 
       function tryBroker(profile, i) {
         if (i >= BROKERS.length) {
           setConnStatus(
-            "Couldn't reach any realtime broker — this network may be blocking WebSocket connections. Try a different network or another browser.",
+            "تعذّر الوصول إلى أي وسيط اتصال — قد تحجب الشبكة اتصالات WebSocket. جرّب شبكة أو متصفحاً آخر.",
             "error"
           );
-          toast("⚠️ Connection failed");
+          toast("⚠️ فشل الاتصال");
           return;
         }
         const client = mqtt.connect(BROKERS[i], {
@@ -1085,10 +1086,10 @@
 
           const info = el("div", "user-info");
           const name = el("div", "user-name", u.name);
-          const sub = el("div", "user-sub", "Member of the gang");
+          const sub = el("div", "user-sub", "عضو في العصابة");
           info.append(name, sub);
 
-          const tag = el("span", "status-tag", u.inGame ? "In a game" : "Online");
+          const tag = el("span", "status-tag", u.inGame ? "في لعبة" : "متصل");
           if (u.inGame) tag.classList.add("ingame");
           else tag.prepend(el("span", "dot"));
 
@@ -1096,9 +1097,9 @@
 
           const busy = u.id === inGameWith;
           if (!busy) {
-            const btn = el("button", "play-btn", "Play 🎮");
+            const btn = el("button", "play-btn", "العب 🎮");
             btn.disabled = u.inGame;
-            if (u.inGame) btn.textContent = "Playing";
+            if (u.inGame) btn.textContent = "يلعب";
             btn.addEventListener("click", () => sendInvite(u));
             row.append(btn);
           }
@@ -1110,7 +1111,7 @@
       // ---------- game requests ----------
       function sendInvite(target) {
         if (state.game) return;
-        if (target.inGame) return toast("⚠️ They're already in a game.");
+        if (target.inGame) return toast("⚠️ هو يلعب الآن.");
         const reqId = rand();
         state.pendingRequest = {
           reqId,
@@ -1118,11 +1119,11 @@
           timer: setTimeout(() => {
             safePublish(T.req(target.id), JSON.stringify({ t: "cancel", reqId }));
             if (state.pendingRequest && state.pendingRequest.reqId === reqId) state.pendingRequest = null;
-            toast("⏳ Your challenge expired.");
+            toast("⏳ انتهى وقت تحديك.");
           }, REQUEST_TTL_MS),
         };
         safePublish(T.req(target.id), JSON.stringify({ t: "invite", reqId, from: { id: state.profile.id, name: displayName(state.profile) } }));
-        toast(`🍬 Challenge sent to ${target.name}!`);
+        toast(`🍬 أُرسل التحدي إلى ${target.name}!`);
       }
 
       function handleReq(payload) {
@@ -1132,7 +1133,7 @@
         if (m.t === "invite") {
           if (state.game && state.game.status === "playing") {
             safePublish(T.req(m.from.id), JSON.stringify({ t: "reply", reqId: m.reqId, accept: false, from: { id: state.profile.id, name: displayName(state.profile) } }));
-            toast("⚠️ You're already in a game.");
+            toast("⚠️ أنت تلعب الآن.");
             return;
           }
           state.requestQueue.push({ reqId: m.reqId, from: m.from });
@@ -1143,14 +1144,14 @@
           clearTimeout(pending.timer);
           state.pendingRequest = null;
           if (m.accept) startGame(pending.to);
-          else toast(`${m.from.name} declined your challenge 😢`);
+          else toast(`${m.from.name} رفض تحديك 😢`);
         } else if (m.t === "cancel") {
           if (state.requestId === m.reqId) {
             state.requestId = null;
             $("request-banner").classList.add("hidden");
             state.requestQueue = state.requestQueue.filter((r) => r.reqId !== m.reqId);
             showNextRequest();
-            toast("⏳ That challenge expired.");
+            toast("⏳ انتهى وقت التحدي.");
           }
         }
       }
@@ -1250,7 +1251,7 @@
           if (g.status === "playing" && opponentOf(g).id === m.by) {
             forfeitGame("forfeit");
           } else {
-            toast("👋 Your opponent went back to the lobby.");
+            toast("👋 عاد خصمك إلى الصالة.");
             exitGame();
           }
         }
@@ -1301,7 +1302,7 @@
           cell.addEventListener("click", () => {
             const g = state.game;
             if (!g || g.status !== "playing") return;
-            if (g.turn !== seatOf(g)) return toast("⏳ Not your turn!");
+            if (g.turn !== seatOf(g)) return toast("⏳ ليس دورك!");
             if (g.board[i]) return;
             doMove(i);
           });
@@ -1352,7 +1353,7 @@
         state.game = null;
         hideWinOverlay();
         $("rematch-btn").classList.add("hidden");
-        $("rematch-btn").textContent = "Rematch 🔁";
+        $("rematch-btn").textContent = "إعادة 🔁";
         $("rematch-btn").disabled = false;
         renderUsers();
         showScreen("home");
@@ -1393,11 +1394,11 @@
         const mySym = seatOf(g);
         if (g.status === "playing") {
           banner.classList.toggle("mine", g.turn === mySym);
-          banner.textContent = g.turn === mySym ? "Your turn! 🍭" : `${displayName(opponentOf(g))}'s turn…`;
+          banner.textContent = g.turn === mySym ? "دورك! 🍭" : `دور ${displayName(opponentOf(g))}…`;
         } else if (g.reason === "draw") {
-          banner.textContent = "It's a draw! 🤝";
+          banner.textContent = "تعادل! 🤝";
         } else {
-          banner.textContent = g.winner === mySym ? "You win! 🎉" : `${displayName(opponentOf(g))} wins!`;
+          banner.textContent = g.winner === mySym ? "فزت! 🎉" : `${displayName(opponentOf(g))} فاز!`;
         }
       }
 
@@ -1413,20 +1414,20 @@
         rematchBtn.classList.remove("hidden");
         rematchBtn.disabled = false;
         if (g.rematch && (g.rematch.me || g.rematch.opp)) {
-          rematchBtn.textContent = "Waiting for your rematch…";
+          rematchBtn.textContent = "بانتظار إعادة الخصم…";
         } else {
-          rematchBtn.textContent = "Rematch 🔁";
+          rematchBtn.textContent = "إعادة 🔁";
         }
 
         if (g.reason === "disconnect" || g.reason === "forfeit") {
           $("win-emoji").textContent = g.winner === mySym ? "🏆" : "😵";
-          $("win-title").textContent = g.winner === mySym ? "You win!" : "Opponent left";
+          $("win-title").textContent = g.winner === mySym ? "فزت!" : "غادر الخصم";
           $("win-sub").textContent =
             g.reason === "disconnect"
-              ? "They disconnected."
+              ? "انقطع اتصاله."
               : g.winner === mySym
-                ? "They left the game."
-                : "You left — head back to the lobby.";
+                ? "غادر اللعبة."
+                : "غادرت — عد إلى الصالة.";
           if (g.winner === mySym) startConfetti();
           $("win-overlay").classList.remove("hidden");
           return;
@@ -1434,13 +1435,13 @@
 
         if (g.winner === mySym) {
           $("win-emoji").textContent = "🎉";
-          $("win-title").textContent = "You win!";
-          $("win-sub").textContent = "Sweet victory 🍓";
+          $("win-title").textContent = "فزت!";
+          $("win-sub").textContent = "فوز جميل 🍓";
           startConfetti();
         } else {
           $("win-emoji").textContent = "🍂";
-          $("win-title").textContent = "So close!";
-          $("win-sub").textContent = `${displayName(opponentOf(g))} takes this one. Rematch?`;
+          $("win-title").textContent = "للأسف!";
+          $("win-sub").textContent = `${displayName(opponentOf(g))} أخذها هذه المرة. إعادة؟`;
         }
         $("win-overlay").classList.remove("hidden");
       }
@@ -1462,7 +1463,7 @@
         const g = state.game;
         if (!g || g.status !== "over") return;
         g.rematch.me = true;
-        $("rematch-btn").textContent = "Waiting…";
+        $("rematch-btn").textContent = "بانتظار الخصم…";
         $("rematch-btn").disabled = true;
         hideWinOverlay();
         safePublish(T.game(g.gameId), JSON.stringify({ t: "rematch", gameId: g.gameId, by: state.profile.id }));
@@ -1544,11 +1545,11 @@
       function boot() {
         buildBoard();
         if (window.mqtt) return startApp();
-        setConnStatus("Loading the candy network… 🍬", "info");
+        setConnStatus("جارٍ تحميل شبكة الحلويات… 🍬", "info");
         window.__onMqttLoaded = (ok) => {
           if (!ok) {
             setConnStatus(
-              "Couldn't load the connection library from any CDN — this network may be blocking it. Try a different network or another browser.",
+              "تعذّر تحميل مكتبة الاتصال من أي خادم — قد تحجبه الشبكة. جرّب شبكة أو متصفحاً آخر.",
               "error"
             );
             return;
