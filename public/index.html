@@ -584,13 +584,6 @@
       100% { transform: scale(1); }
     }
 
-    .game-actions {
-      display: flex;
-      justify-content: center;
-      margin-top: 18px;
-      min-height: 52px;
-    }
-
     /* ---------- win overlay ---------- */
     .win-overlay {
       position: fixed;
@@ -621,7 +614,14 @@
     .win-title { font-size: 28px; font-weight: 800; margin-top: 6px; }
     .win-sub { margin-top: 4px; color: var(--ink-soft); font-weight: 500; }
 
-    .win-overlay .pill { margin-top: 20px; }
+    .win-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 22px;
+      min-width: 220px;
+    }
+    .win-actions .pill { width: 100%; }
 
     /* ---------- toasts ---------- */
     .toasts {
@@ -799,16 +799,16 @@
 
       <div id="board" class="board"></div>
 
-      <div class="game-actions">
-        <button id="rematch-btn" class="pill rematch hidden">إعادة 🔁</button>
-      </div>
-
       <div id="win-overlay" class="win-overlay hidden">
         <canvas id="confetti-canvas"></canvas>
         <div class="win-card">
           <div class="win-emoji" id="win-emoji">🎉</div>
           <div class="win-title" id="win-title">فزت!</div>
           <div class="win-sub" id="win-sub">فوز جميل 🍓</div>
+          <div class="win-actions">
+            <button id="rematch-btn" class="pill rematch hidden">إعادة 🔁</button>
+            <button id="lobby-btn" class="pill ghost">العودة للصالة</button>
+          </div>
         </div>
       </div>
     </section>
@@ -1630,14 +1630,17 @@
         $("win-overlay").classList.add("hidden");
       }
 
-      $("back-btn").addEventListener("click", () => {
+      function leaveToLobby() {
         const g = state.game;
         if (g && state.mode !== "ai") {
           safePublish(T.game(g.gameId), JSON.stringify({ t: "leave", gameId: g.gameId, by: state.profile.id }));
           setInGame(false);
         }
         exitGame();
-      });
+      }
+
+      $("back-btn").addEventListener("click", leaveToLobby);
+      $("lobby-btn").addEventListener("click", leaveToLobby);
 
       $("rematch-btn").addEventListener("click", () => {
         const g = state.game;
