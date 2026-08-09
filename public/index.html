@@ -2,9 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
   <meta name="theme-color" content="#ffe6f2" />
-  <title>ألعاب الحلويات 🍬 · v6</title>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>ألعاب الحلويات 🍬 · v7</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍭</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,6 +35,10 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
 
     html, body {
       height: 100%;
@@ -85,6 +93,7 @@
       margin: 0 auto;
       padding: 22px 16px calc(40px + env(safe-area-inset-bottom));
       min-height: 100vh;
+      min-height: 100dvh;
     }
 
     .screen { display: none; animation: screenIn 0.35s ease both; }
@@ -107,6 +116,7 @@
 
     .center-card {
       margin-top: 14vh;
+      margin-top: max(12vh, 56px);
       text-align: center;
     }
 
@@ -129,7 +139,7 @@
     }
 
     .title {
-      font-size: 34px;
+      font-size: clamp(28px, 9vw, 34px);
       font-weight: 800;
       letter-spacing: 0.5px;
       background: linear-gradient(90deg, #ff6fa5, #a78bfa, #4ecdc4);
@@ -226,6 +236,16 @@
     .avatar.sm { width: 42px; height: 42px; font-size: 15px; }
 
     /* ---------- pills & buttons ---------- */
+    .pill,
+    .play-btn,
+    .mode-card,
+    .cell,
+    .request-banner .pill {
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
     .pill {
       border: none;
       cursor: pointer;
@@ -499,7 +519,7 @@
 
     .turn-banner {
       text-align: center;
-      font-size: 17px;
+      font-size: clamp(15px, 4.5vw, 17px);
       font-weight: 600;
       padding: 10px 16px;
       margin-bottom: 14px;
@@ -641,9 +661,32 @@
     /* ---------- utils ---------- */
     .hidden { display: none !important; }
 
+    /* ---------- small phone tweaks ---------- */
     @media (max-width: 380px) {
       .request-banner { flex-wrap: wrap; }
       .request-banner .rb-text { flex-basis: calc(100% - 54px); }
+
+      .modes { grid-template-columns: 1fr; }
+      .mode-card { flex-direction: row; text-align: right; justify-content: flex-start; gap: 12px; padding: 14px 16px; }
+      .mode-emoji { font-size: 30px; }
+      .mode-sub { flex: 1; text-align: right; }
+
+      .app { padding-left: 12px; padding-right: 12px; }
+      .user-row { gap: 10px; padding: 11px 12px; }
+      .play-btn { padding: 8px 13px; font-size: 13px; }
+      .status-tag { font-size: 11px; padding: 3px 8px; }
+    }
+
+    @media (max-height: 640px) {
+      .center-card { margin-top: max(6vh, 32px); }
+      .app { padding-top: 14px; }
+      .logo-bubble { width: 76px; height: 76px; font-size: 38px; margin-bottom: 10px; }
+      .card { padding: 20px 20px; }
+      .user-list { max-height: 40vh; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .blob, .floaty, .logo-bubble, .dot, .win-emoji { animation: none; }
     }
   </style>
 </head>
@@ -673,7 +716,7 @@
           <p class="quick-hint">بدون تسجيل وبدون ID — اختر اسماً وابدأ اللعب.</p>
         </form>
         <p class="fine">اسمك يظهر لمن يكون متصلاً في نفس الوقت.</p>
-        <p class="fine build-tag">build v6</p>
+        <p class="fine build-tag">build v7</p>
       </div>
     </section>
 
@@ -807,7 +850,7 @@
     (() => {
       "use strict";
 
-      const APP_VERSION = "6";
+      const APP_VERSION = "7";
       window.__APP_VERSION = APP_VERSION;
       window.document.title = "ألعاب الحلويات 🍬 · v" + APP_VERSION;
 
