@@ -8,14 +8,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="format-detection" content="telephone=no" />
-  <title>ألعاب الحلويات 🍬 · v7</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍭</text></svg>" />
+  <title>ألعاب الحلويات · v8</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.4 7.4 3.4 5 1 8.4l2.4 3.4L8.4 15Z' fill='%23f8d7ea'/><path d='M15.6 7.4l5-2.4L23 8.4l-2.4 3.4-5 3.2Z' fill='%23f8d7ea'/><rect x='8.4' y='6.2' width='7.2' height='11.6' rx='3.4' fill='%23ff9dbe'/><path d='M12 6.2v11.6' stroke='white' stroke-width='1.3' stroke-linecap='round' opacity='0.9'/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    /* style.css — Candy style design system for Candy Games 🍬 */
+    /* style.css — Candy style design system for Candy Games */
 
     :root {
       --pink: #ff6fa5;
@@ -71,7 +71,8 @@
 
     .floaty {
       position: absolute;
-      font-size: 30px;
+      width: 30px;
+      height: 30px;
       opacity: 0.5;
       animation: floaty 9s ease-in-out infinite;
     }
@@ -126,12 +127,12 @@
       margin: 0 auto 14px;
       display: grid;
       place-items: center;
-      font-size: 48px;
       border-radius: 32px;
       background: linear-gradient(135deg, var(--pink-soft), var(--purple-soft));
       box-shadow: var(--shadow-soft);
       animation: wiggle 3.2s ease-in-out infinite;
     }
+    .logo-bubble svg { width: 52px; height: 52px; }
 
     @keyframes wiggle {
       0%, 100% { transform: rotate(-4deg); }
@@ -211,7 +212,8 @@
     .me { display: flex; align-items: center; gap: 12px; min-width: 0; }
     .me-text { min-width: 0; }
     .greeting { font-size: 19px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .online-count { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+    .online-count { font-size: 13px; color: var(--ink-soft); margin-top: 2px; display: inline-flex; align-items: center; gap: 5px; }
+.online-count svg { width: 16px; height: 16px; }
 
     /* ---------- avatars ---------- */
     .avatar {
@@ -307,7 +309,7 @@
     }
     .mode-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
     .mode-card:active { transform: translateY(0) scale(0.97); }
-    .mode-emoji { font-size: 34px; }
+    .mode-icon { width: 34px; height: 34px; }
     .mode-title { font-size: 16px; font-weight: 700; }
     .mode-sub { font-size: 12px; color: var(--ink-soft); line-height: 1.4; }
 
@@ -410,8 +412,8 @@
     .play-btn:active { transform: scale(0.95); }
     .play-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    .empty { text-align: center; padding: 40px 0; color: var(--ink-soft); }
-    .empty-emoji { font-size: 44px; margin-bottom: 8px; }
+.empty { text-align: center; padding: 40px 0; color: var(--ink-soft); }
+.empty-emoji { width: 44px; height: 44px; margin-bottom: 8px; }
 
     /* ---------- request banner ---------- */
     .request-banner {
@@ -610,7 +612,8 @@
       border: 1px solid rgba(255, 255, 255, 0.8);
       animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
-    .win-emoji { font-size: 64px; animation: wiggle 1.4s ease-in-out infinite; }
+    .win-emoji { display: grid; place-items: center; animation: wiggle 1.4s ease-in-out infinite; }
+.win-emoji svg { width: 64px; height: 64px; }
     .win-title { font-size: 28px; font-weight: 800; margin-top: 6px; }
     .win-sub { margin-top: 4px; color: var(--ink-soft); font-weight: 500; }
 
@@ -622,6 +625,10 @@
       min-width: 220px;
     }
     .win-actions .pill { width: 100%; }
+
+/* ---------- inline icons ---------- */
+.btn-icon { width: 17px; height: 17px; vertical-align: -3px; margin-inline-end: 6px; flex-shrink: 0; }
+.inline-ic { width: 16px; height: 16px; vertical-align: -3px; display: inline-block; }
 
     /* ---------- toasts ---------- */
     .toasts {
@@ -636,18 +643,22 @@
       width: min(400px, calc(100% - 32px));
       pointer-events: none;
     }
-    .toast {
-      pointer-events: auto;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(16px);
-      border-radius: 16px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      padding: 11px 16px;
-      font-size: 14px;
-      font-weight: 500;
-      animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.toast-icon { width: 16px; height: 16px; flex-shrink: 0; }
     .toast.out { animation: toastOut 0.3s ease both; }
     @keyframes toastIn {
       from { opacity: 0; transform: translateY(-18px) scale(0.95); }
@@ -668,7 +679,7 @@
 
       .modes { grid-template-columns: 1fr; }
       .mode-card { flex-direction: row; text-align: right; justify-content: flex-start; gap: 12px; padding: 14px 16px; }
-      .mode-emoji { font-size: 30px; }
+      .mode-icon { width: 30px; height: 30px; }
       .mode-sub { flex: 1; text-align: right; }
 
       .app { padding-left: 12px; padding-right: 12px; }
@@ -680,7 +691,8 @@
     @media (max-height: 640px) {
       .center-card { margin-top: max(6vh, 32px); }
       .app { padding-top: 14px; }
-      .logo-bubble { width: 76px; height: 76px; font-size: 38px; margin-bottom: 10px; }
+      .logo-bubble { width: 76px; height: 76px; margin-bottom: 10px; }
+.logo-bubble svg { width: 42px; height: 42px; }
       .card { padding: 20px 20px; }
       .user-list { max-height: 40vh; }
     }
@@ -691,32 +703,168 @@
   </style>
 </head>
 <body>
-  <div class="blobs" aria-hidden="true">
-    <span class="blob b1"></span>
-    <span class="blob b2"></span>
-    <span class="blob b3"></span>
-    <span class="floaty f1">🍬</span>
-    <span class="floaty f2">🍭</span>
-    <span class="floaty f3">🍡</span>
-    <span class="floaty f4">🧁</span>
-  </div>
+<svg style="display:none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<symbol id="i-candy" viewBox="0 0 24 24">
+<path d="M8.4 7.4 3.4 5 1 8.4l2.4 3.4L8.4 15Z" fill="#f8d7ea"/>
+<path d="M15.6 7.4l5-2.4L23 8.4l-2.4 3.4-5 3.2Z" fill="#f8d7ea"/>
+<rect x="8.4" y="6.2" width="7.2" height="11.6" rx="3.4" fill="#ff9dbe"/>
+<path d="M12 6.2v11.6" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".9"/>
+<circle cx="10.4" cy="9" r=".55" fill="#fff" opacity=".9"/>
+</symbol>
+<symbol id="i-lollipop" viewBox="0 0 24 24">
+<circle cx="12" cy="9" r="5.9" fill="#ff6fa5"/>
+<circle cx="12" cy="9" r="3.6" fill="none" stroke="#ffd3e4" stroke-width="1.6" opacity=".9"/>
+<circle cx="12" cy="9" r="1.3" fill="#ffd3e4"/>
+<rect x="11.2" y="13.8" width="1.6" height="6.8" rx="0.8" fill="#a78bfa"/>
+</symbol>
+<symbol id="i-dango" viewBox="0 0 24 24">
+<rect x="11.2" y="3" width="1.6" height="18" rx="0.8" fill="#d9c6ef"/>
+<circle cx="12" cy="6.2" r="2.9" fill="#ff9dbe"/>
+<circle cx="12" cy="11.4" r="2.9" fill="#a3e8e2"/>
+<circle cx="12" cy="16.6" r="2.9" fill="#ffd98a"/>
+<circle cx="11.1" cy="5.3" r=".7" fill="#fff" opacity=".9"/>
+<circle cx="11.1" cy="10.5" r=".7" fill="#fff" opacity=".9"/>
+<circle cx="11.1" cy="15.7" r=".7" fill="#fff" opacity=".9"/>
+</symbol>
+<symbol id="i-cupcake" viewBox="0 0 24 24">
+<path d="M6.6 9.6h10.8l-.9 7.5a2.3 2.3 0 0 1-2.3 2H9.8a2.3 2.3 0 0 1-2.3-2Z" fill="#c4b5fd"/>
+<path d="M9 9.6v9.5M12 9.6v9.5M15 9.6v9.5" stroke="#a78bfa" stroke-width="1.2" stroke-linecap="round" opacity=".5"/>
+<path d="M5.8 9.6a6.2 6.2 0 0 1 12.4 0Z" fill="#ff9dbe"/>
+<path d="M9.4 9.4c-.2-2 1-3.2 2.6-3.2 1.9 0 2.8 1.4 2.6 3.2" stroke="#ff6fa5" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<circle cx="12" cy="5.6" r="1.4" fill="#ff6fa5"/>
+</symbol>
+<symbol id="i-heart" viewBox="0 0 24 24">
+<path d="M12 20.2C5.8 15 3.6 10.6 5.5 7.6 7 5.4 10 5.4 12 7.6c2-2.2 5-2.2 6.5 0 1.9 3-.3 7.4-6.5 12.6Z" fill="#ff6fa5"/>
+<path d="M8.6 8.4c-.6.6-.8 1.6-.4 2.4" stroke="#ffd3e4" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8"/>
+</symbol>
+<symbol id="i-bear" viewBox="0 0 24 24">
+<circle cx="7.4" cy="8.6" r="2.4" fill="#d9b48f"/>
+<circle cx="16.6" cy="8.6" r="2.4" fill="#d9b48f"/>
+<ellipse cx="12" cy="14.5" rx="6.8" ry="6" fill="#d9b48f"/>
+<ellipse cx="8.9" cy="13" rx="1" ry="1.1" fill="#5b4434"/>
+<ellipse cx="15.1" cy="13" rx="1" ry="1.1" fill="#5b4434"/>
+<ellipse cx="12" cy="16" rx="3.1" ry="2.3" fill="#f3e2cf"/>
+<ellipse cx="12" cy="15.3" rx="1.2" ry=".9" fill="#5b4434"/>
+<path d="M12 16.2c-1 .3-2 .1-2.6-.5.3 1 1.4 1.6 2.6 1.6s2.3-.6 2.6-1.6c-.6.6-1.6.8-2.6.5Z" fill="#5b4434" opacity=".85"/>
+</symbol>
+<symbol id="i-robot" viewBox="0 0 24 24">
+<rect x="3.5" y="8" width="17" height="10.5" rx="3" fill="#a78bfa"/>
+<rect x="6.4" y="3.4" width="2.6" height="4.6" rx="1.3" fill="#c4b5fd"/>
+<rect x="15" y="3.4" width="2.6" height="4.6" rx="1.3" fill="#c4b5fd"/>
+<rect x="10.8" y="4.8" width="2.4" height="3.2" rx="1.2" fill="#ffc94d"/>
+<circle cx="6.5" cy="13" r="1.5" fill="#fff"/>
+<circle cx="17.5" cy="13" r="1.5" fill="#fff"/>
+<path d="M9 16.8c.9.8 5.1.8 6 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</symbol>
+<symbol id="i-friends" viewBox="0 0 24 24">
+<circle cx="8.5" cy="7.5" r="3" fill="#ff9dbe"/>
+<path d="M2.8 20c.4-4.4 2.6-6.5 5.7-6.5s5.3 2.1 5.7 6.5Z" fill="#ff9dbe"/>
+<circle cx="16.5" cy="9.5" r="2.6" fill="#4ecdc4"/>
+<path d="M12.6 20c.4-3.8 2-5.6 4.4-5.6 2.2 0 3.8 1.6 4.2 5.6Z" fill="#4ecdc4"/>
+</symbol>
+<symbol id="i-pot" viewBox="0 0 24 24">
+<rect x="5.4" y="8.4" width="13.2" height="2.4" rx="1.2" fill="#e0a93a"/>
+<path d="M7 10.4h10l-1.1 8.2a2.2 2.2 0 0 1-2.2 1.9h-3.4a2.2 2.2 0 0 1-2.2-1.9Z" fill="#ffc94d"/>
+<path d="M10 13.2c.8 1.4 3.2 1.4 4 0 .8 1.4 3.2 1.4 4 0" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".85"/>
+</symbol>
+<symbol id="i-gamepad" viewBox="0 0 24 24">
+<path d="M7 7.5h10a5 5 0 0 1 4.9 6.1l-.8 3a2.6 2.6 0 0 1-4.9.4l-.7-1.8H8.5l-.7 1.8a2.6 2.6 0 0 1-4.9-.4l-.8-3A5 5 0 0 1 7 7.5Z" fill="#a78bfa"/>
+<path d="M7.8 9.8v3.4M6.1 11.5h3.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+<circle cx="16.2" cy="10.4" r="1.15" fill="#ffc94d"/>
+<circle cx="18.4" cy="12.4" r="1.15" fill="#ff9dbe"/>
+</symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24">
+<path d="M8.2 3.5h7.6v4.4a3.8 3.8 0 0 1-7.6 0Z" fill="#ffc94d"/>
+<path d="M8.2 5H5.4c-.9 0-1.6.9-1.4 1.8.4 1.7 2 3.2 4 3.2M15.8 5h2.8c.9 0 1.6.9 1.4 1.8-.4 1.7-2 3.2-4 3.2" stroke="#ffc94d" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<rect x="11.2" y="11.4" width="1.6" height="4.2" rx="0.8" fill="#ffc94d"/>
+<rect x="8" y="16.4" width="8" height="1.7" rx="0.85" fill="#ffc94d"/>
+<path d="M12 3.5v2.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+</symbol>
+<symbol id="i-dizzy" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="8.5" fill="#ffc94d"/>
+<path d="M8.4 8.4l3.4 3.4M11.8 8.4l-3.4 3.4" stroke="#8a6410" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M15.2 8.4l3.4 3.4M18.6 8.4l-3.4 3.4" stroke="#8a6410" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M9.4 16.6c1.7 1.5 3.5 1.5 5.2 0" stroke="#8a6410" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<path d="M7.5 4.6 5.5 3M18.5 4.6 20.5 3" stroke="#ff9dbe" stroke-width="1.4" stroke-linecap="round"/>
+</symbol>
+<symbol id="i-party" viewBox="0 0 24 24">
+<path d="m12 2.2 2 4.6 5 .6-3.7 3.4 1 4.9-4.3-2.6-4.3 2.6 1-4.9L5 7.4l5-.6Z" fill="#ffc94d"/>
+<path d="m12 8.4.9 2.2 2.3.3-1.7 1.5.5 2.3-2-.9-2 .9.5-2.3-1.7-1.5 2.3-.3Z" fill="#fff" opacity=".85"/>
+<circle cx="4.4" cy="5.6" r="1.1" fill="#ff9dbe"/>
+<circle cx="19.6" cy="6.2" r="1.1" fill="#4ecdc4"/>
+<circle cx="17.5" cy="18.5" r="1.1" fill="#a78bfa"/>
+<circle cx="5.5" cy="18.6" r="0.9" fill="#ff6fa5"/>
+</symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24">
+<path d="M19 4.6C12.6 4.8 8 7.2 6.3 12.9c-.5 1.7-.3 3.4.8 4.5 1.3 1.3 3.1 1.4 4.8.8 3.4-1.1 5.5-4.5 6.8-8.4.4-1.3.5-3 .3-4.9.1-.9-.6-1.7-1.5-1.7l-.8-.1c-.2-.7-.7-1.2-1.4-1.5Z" fill="#d9a05b"/>
+<path d="M6.8 17.6c2.6-3.2 6.3-6.2 10.9-8.8" stroke="#f3e2cf" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".85"/>
+</symbol>
+<symbol id="i-strawberry" viewBox="0 0 24 24">
+<path d="M12 5c-3.3.8-5 3.5-5 6.9 0 3.4 2.3 6.6 5 6.6s5-3.2 5-6.6c0-3.4-1.7-6.1-5-6.9Z" fill="#ff6fa5"/>
+<path d="m9 6.2-2.2-2.8 3 1L12 2.3l2.2 2.1 3-1-2.2 2.8Z" fill="#4ecdc4"/>
+<circle cx="9.6" cy="10" r=".45" fill="#ffd3e4"/>
+<circle cx="12" cy="12.8" r=".45" fill="#ffd3e4"/>
+<circle cx="14.4" cy="9.8" r=".45" fill="#ffd3e4"/>
+<circle cx="12" cy="8.2" r=".45" fill="#ffd3e4"/>
+<circle cx="13.6" cy="14.6" r=".45" fill="#ffd3e4"/>
+</symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24">
+<path d="M19.4 12a7.4 7.4 0 1 1-2.2-5.2" stroke="#a78bfa" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<path d="M19.6 3.6v3.6h-3.6" stroke="#a78bfa" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+<symbol id="i-warning" viewBox="0 0 24 24">
+<path d="M12 3.2 21.8 19H2.2Z" fill="#ffc94d"/>
+<path d="M12 8.4v5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+<circle cx="12" cy="16.2" r="1" fill="#fff"/>
+</symbol>
+<symbol id="i-clock" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="8.2" stroke="#a78bfa" stroke-width="2" fill="none"/>
+<path d="M12 7.4V12l3 1.8" stroke="#a78bfa" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+<symbol id="i-wave" viewBox="0 0 24 24">
+<rect x="3.6" y="4.6" width="5" height="14.8" rx="1.3" fill="#ff9dbe"/>
+<circle cx="6.6" cy="12" r="0.9" fill="#fff"/>
+<path d="M11.2 12h8.6M16.4 8.6l3.4 3.4-3.4 3.4" stroke="#a78bfa" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+<symbol id="i-draw" viewBox="0 0 24 24">
+<rect x="3.4" y="5" width="17.2" height="14" rx="3.4" fill="#4ecdc4"/>
+<path d="M7.6 10.4h8.8M7.6 14h8.8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+</symbol>
+<symbol id="i-cry" viewBox="0 0 24 24">
+<circle cx="12" cy="12.5" r="8.5" fill="#ffc94d"/>
+<path d="M8 9.2c1 1.2 2 1.2 3 0M13 9.2c1 1.2 2 1.2 3 0" stroke="#8a6410" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+<path d="M10 15.4c1.3 1.1 2.7 1.1 4 0" stroke="#8a6410" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+<path d="M16.6 6.6c1 1.4.6 2.9-.7 3.7 1.7-.4 2.3-2.3 1.4-3.7Z" fill="#7cc6ff"/>
+</symbol>
+</defs>
+</svg>
+<div class="blobs" aria-hidden="true">
+<span class="blob b1"></span>
+<span class="blob b2"></span>
+<span class="blob b3"></span>
+<svg class="floaty f1" aria-hidden="true"><use href="#i-candy"/></svg>
+<svg class="floaty f2" aria-hidden="true"><use href="#i-lollipop"/></svg>
+<svg class="floaty f3" aria-hidden="true"><use href="#i-dango"/></svg>
+<svg class="floaty f4" aria-hidden="true"><use href="#i-cupcake"/></svg>
+</div>
 
   <main class="app">
     <!-- ============ LOGIN ============ -->
     <section id="screen-login" class="screen active">
       <div class="card center-card">
-        <div class="logo-bubble">🍬</div>
-        <h1 class="title">ألعاب الحلويات</h1>
-        <p class="tagline">ألعاب مصغّرة للعصابة 💖</p>
+<div class="logo-bubble"><svg aria-hidden="true"><use href="#i-candy"/></svg></div>
+<h1 class="title">ألعاب الحلويات</h1>
+<p class="tagline">ألعاب مصغّرة للعصابة <svg class="inline-ic" aria-hidden="true"><use href="#i-heart"/></svg></p>
         <form id="quick-login" class="quick-login" autocomplete="off">
           <input id="quick-nick" type="text" maxlength="24" placeholder="اسمك المستعار" autocomplete="nickname" />
-          <button id="quick-btn" type="submit" class="pill">دخول 🍭</button>
+          <button id="quick-btn" type="submit" class="pill">دخول <svg class="btn-icon" aria-hidden="true"><use href="#i-lollipop"/></svg></button>
           <p id="quick-error" class="quick-error hidden"></p>
           <p id="conn-status" class="conn-status hidden"></p>
           <p class="quick-hint">بدون تسجيل وبدون ID — اختر اسماً وابدأ اللعب.</p>
         </form>
         <p class="fine">اسمك يظهر لمن يكون متصلاً في نفس الوقت.</p>
-        <p class="fine build-tag">build v7</p>
+        <p class="fine build-tag">build v8</p>
       </div>
     </section>
 
@@ -727,23 +875,23 @@
           <div id="me-avatar" class="avatar lg"></div>
           <div class="me-text">
             <div class="greeting">أهلاً، <span id="me-name">صديقي</span>!</div>
-            <div id="online-count" class="online-count">🐻 نتحقق من الموجودين…</div>
+            <div id="online-count" class="online-count"><svg aria-hidden="true"><use href="#i-bear"/></svg> نتحقق من الموجودين…</div>
           </div>
         </div>
         <button id="logout-btn" class="pill ghost sm">خروج</button>
       </header>
 
       <div class="modes">
-        <button id="mode-ai" class="mode-card">
-          <span class="mode-emoji">🤖</span>
-          <span class="mode-title">العب ضد الذكاء</span>
-          <span class="mode-sub">تحدَّ الحاسوب في إكس أو</span>
-        </button>
-        <button id="mode-pvp" class="mode-card">
-          <span class="mode-emoji">👥</span>
-          <span class="mode-title">العب 1v1</span>
-          <span class="mode-sub">مع من هم متصلون الآن</span>
-        </button>
+<button id="mode-ai" class="mode-card">
+<svg class="mode-icon" aria-hidden="true"><use href="#i-robot"/></svg>
+<span class="mode-title">العب ضد الذكاء</span>
+<span class="mode-sub">تحدَّ الحاسوب في إكس أو</span>
+</button>
+<button id="mode-pvp" class="mode-card">
+<svg class="mode-icon" aria-hidden="true"><use href="#i-friends"/></svg>
+<span class="mode-title">العب 1v1</span>
+<span class="mode-sub">مع من هم متصلون الآن</span>
+</button>
       </div>
 
       <div class="section-head">
@@ -752,16 +900,16 @@
       </div>
 
       <ul id="user-list" class="user-list"></ul>
-      <div id="empty-state" class="empty hidden">
-        <div class="empty-emoji">🍯</div>
-        <p>لا يوجد أحد هنا بعد.<br />شارك الرابط مع أصدقائك!</p>
-      </div>
+<div id="empty-state" class="empty hidden">
+<svg class="empty-emoji" aria-hidden="true"><use href="#i-pot"/></svg>
+<p>لا يوجد أحد هنا بعد.<br />شارك الرابط مع أصدقائك!</p>
+</div>
 
       <div id="request-banner" class="request-banner hidden" role="alert">
         <div id="rb-avatar" class="avatar"></div>
         <div class="rb-text">
           <strong id="rb-name"></strong>
-          <span>يريد أن يلعب معك إكس أو! 🎮</span>
+          <span>يريد أن يلعب معك إكس أو!</span>
         </div>
         <button id="rb-accept" class="pill accept">قبول</button>
         <button id="rb-decline" class="pill decline">رفض</button>
@@ -772,7 +920,7 @@
     <section id="screen-game" class="screen">
       <header class="game-topbar">
         <button id="back-btn" class="pill ghost sm">الرجوع</button>
-        <div class="game-title">إكس · أو 🍬</div>
+        <div class="game-title">إكس · أو <svg class="inline-ic" aria-hidden="true"><use href="#i-candy"/></svg></div>
       </header>
 
       <div class="scoreboard">
@@ -795,20 +943,20 @@
         </div>
       </div>
 
-      <div id="turn-banner" class="turn-banner">دورك! 🍭</div>
+      <div id="turn-banner" class="turn-banner">دورك! <svg class="inline-ic" aria-hidden="true"><use href="#i-lollipop"/></svg></div>
 
       <div id="board" class="board"></div>
 
       <div id="win-overlay" class="win-overlay hidden">
         <canvas id="confetti-canvas"></canvas>
         <div class="win-card">
-          <div class="win-emoji" id="win-emoji">🎉</div>
-          <div class="win-title" id="win-title">فزت!</div>
-          <div class="win-sub" id="win-sub">فوز جميل 🍓</div>
-          <div class="win-actions">
-            <button id="rematch-btn" class="pill rematch hidden">إعادة 🔁</button>
-            <button id="lobby-btn" class="pill ghost">العودة للصالة</button>
-          </div>
+<div class="win-emoji" id="win-emoji"><svg aria-hidden="true"><use href="#i-party"/></svg></div>
+<div class="win-title" id="win-title">فزت!</div>
+<div class="win-sub" id="win-sub">فوز جميل</div>
+<div class="win-actions">
+<button id="rematch-btn" class="pill rematch hidden">إعادة <svg class="btn-icon" aria-hidden="true"><use href="#i-refresh"/></svg></button>
+<button id="lobby-btn" class="pill ghost">العودة للصالة</button>
+</div>
         </div>
       </div>
     </section>
@@ -850,15 +998,15 @@
     (() => {
       "use strict";
 
-      const APP_VERSION = "7";
-      window.__APP_VERSION = APP_VERSION;
-      window.document.title = "ألعاب الحلويات 🍬 · v" + APP_VERSION;
+  const APP_VERSION = "8";
+  window.__APP_VERSION = APP_VERSION;
+  window.document.title = "ألعاب الحلويات · v" + APP_VERSION;
 
       // Surface any runtime error on screen so failures are never silent.
       window.addEventListener("error", (e) => {
         const m = (e && e.message) || "خطأ غير معروف";
         setConnStatus("خطأ: " + m + (e && e.filename ? " (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : ""), "error");
-        toast("⚠️ " + m);
+        toast(m, "warning");
       });
       window.addEventListener("unhandledrejection", (e) => {
         const r = e && e.reason;
@@ -866,6 +1014,17 @@
       });
 
       const $ = (id) => document.getElementById(id);
+const SVG_NS = "http://www.w3.org/2000/svg";
+const svgEl = (icon, cls) => {
+  const s = document.createElementNS(SVG_NS, "svg");
+  if (cls) s.setAttribute("class", cls);
+  s.setAttribute("aria-hidden", "true");
+  const u = document.createElementNS(SVG_NS, "use");
+  u.setAttribute("href", "#i-" + icon);
+  s.appendChild(u);
+  return s;
+};
+const svgHtml = (icon, cls) => `<svg ${cls ? 'class="' + cls + '" ' : ""}aria-hidden="true"><use href="#i-${icon}"/></svg>`;
       const screens = { login: $("screen-login"), home: $("screen-home"), game: $("screen-game") };
       const PROFILE_KEY = "candygames.profile";
       const UID_KEY = "candygames.uid";
@@ -950,16 +1109,18 @@
         Object.entries(screens).forEach(([k, s]) => s.classList.toggle("active", k === name));
       }
 
-      function toast(message) {
-        const wrap = $("toasts");
-        const t = el("div", "toast", message);
-        wrap.appendChild(t);
-        setTimeout(() => {
-          t.classList.add("out");
-          setTimeout(() => t.remove(), 320);
-        }, 2600);
-        while (wrap.children.length > 3) wrap.firstElementChild.remove();
-      }
+function toast(message, icon) {
+  const wrap = $("toasts");
+  const t = el("div", "toast");
+  if (icon) t.appendChild(svgEl(icon, "toast-icon"));
+  t.appendChild(document.createTextNode(message));
+  wrap.appendChild(t);
+  setTimeout(() => {
+    t.classList.add("out");
+    setTimeout(() => t.remove(), 320);
+  }, 2600);
+  while (wrap.children.length > 3) wrap.firstElementChild.remove();
+}
 
       function setConnStatus(message, kind) {
         const el = $("conn-status");
@@ -987,7 +1148,7 @@
         quickError.classList.add("hidden");
         const nickname = quickNick.value.trim();
         if (!nickname) {
-          showQuickError("اختر اسماً مستعاراً أولاً! 🍭");
+          showQuickError("اختر اسماً مستعاراً أولاً!");
           quickNick.focus();
           return;
         }
@@ -1028,7 +1189,7 @@
       function startSession(profile) {
         state.profile = profile;
         state.sessionId = `${profile.id}_${rand()}`;
-        setConnStatus("جارٍ الاتصال بشبكة الحلويات… 🍬", "info");
+        setConnStatus("جارٍ الاتصال بشبكة الحلويات…", "info");
         tryBroker(profile, 0);
       }
 
@@ -1038,7 +1199,7 @@
             "تعذّر الوصول إلى أي وسيط اتصال — قد تحجب الشبكة اتصالات WebSocket. جرّب شبكة أو متصفحاً آخر.",
             "error"
           );
-          toast("⚠️ فشل الاتصال");
+          toast("فشل الاتصال", "warning");
           return;
         }
         const client = mqtt.connect(BROKERS[i], {
@@ -1187,11 +1348,16 @@
 
           const busy = u.id === inGameWith;
           if (!busy) {
-            const btn = el("button", "play-btn", "العب 🎮");
-            btn.disabled = u.inGame;
-            if (u.inGame) btn.textContent = "يلعب";
-            btn.addEventListener("click", () => sendInvite(u));
-            row.append(btn);
+    const btn = el("button", "play-btn");
+    btn.disabled = u.inGame;
+    if (u.inGame) {
+      btn.textContent = "يلعب";
+    } else {
+      btn.textContent = "العب ";
+      btn.appendChild(svgEl("gamepad", "btn-icon"));
+      btn.addEventListener("click", () => sendInvite(u));
+    }
+    row.append(btn);
           }
 
           list.appendChild(row);
@@ -1201,19 +1367,19 @@
       // ---------- game requests ----------
       function sendInvite(target) {
         if (state.game) return;
-        if (target.inGame) return toast("⚠️ هو يلعب الآن.");
-        const reqId = rand();
-        state.pendingRequest = {
-          reqId,
-          to: target,
-          timer: setTimeout(() => {
-            safePublish(T.req(target.id), JSON.stringify({ t: "cancel", reqId }));
-            if (state.pendingRequest && state.pendingRequest.reqId === reqId) state.pendingRequest = null;
-            toast("⏳ انتهى وقت تحديك.");
-          }, REQUEST_TTL_MS),
-        };
-        safePublish(T.req(target.id), JSON.stringify({ t: "invite", reqId, from: { id: state.profile.id, name: displayName(state.profile) } }));
-        toast(`🍬 أُرسل التحدي إلى ${target.name}!`);
+if (target.inGame) return toast("هو يلعب الآن.", "warning");
+const reqId = rand();
+state.pendingRequest = {
+  reqId,
+  to: target,
+  timer: setTimeout(() => {
+    safePublish(T.req(target.id), JSON.stringify({ t: "cancel", reqId }));
+    if (state.pendingRequest && state.pendingRequest.reqId === reqId) state.pendingRequest = null;
+    toast("انتهى وقت تحديك.", "clock");
+  }, REQUEST_TTL_MS),
+};
+safePublish(T.req(target.id), JSON.stringify({ t: "invite", reqId, from: { id: state.profile.id, name: displayName(state.profile) } }));
+toast(`أُرسل التحدي إلى ${target.name}!`, "candy");
       }
 
       function handleReq(payload) {
@@ -1223,8 +1389,8 @@
         if (m.t === "invite") {
           if (state.game && state.game.status === "playing") {
             safePublish(T.req(m.from.id), JSON.stringify({ t: "reply", reqId: m.reqId, accept: false, from: { id: state.profile.id, name: displayName(state.profile) } }));
-            toast("⚠️ أنت تلعب الآن.");
-            return;
+toast("أنت تلعب الآن.", "warning");
+return;
           }
           state.requestQueue.push({ reqId: m.reqId, from: m.from });
           if (!state.requestId) showNextRequest();
@@ -1234,14 +1400,14 @@
           clearTimeout(pending.timer);
           state.pendingRequest = null;
           if (m.accept) startGame(pending.to);
-          else toast(`${m.from.name} رفض تحديك 😢`);
+          else toast(m.from.name + " رفض تحديك", "cry");
         } else if (m.t === "cancel") {
           if (state.requestId === m.reqId) {
             state.requestId = null;
             $("request-banner").classList.add("hidden");
             state.requestQueue = state.requestQueue.filter((r) => r.reqId !== m.reqId);
             showNextRequest();
-            toast("⏳ انتهى وقت التحدي.");
+            toast("انتهى وقت التحدي.", "clock");
           }
         }
       }
@@ -1309,7 +1475,7 @@
 
       // ---------- AI mode ----------
       function startAiGame() {
-        if (state.game && state.game.status === "playing") return toast("⚠️ أنهِ اللعبة الحالية أولاً.");
+        if (state.game && state.game.status === "playing") return toast("أنهِ اللعبة الحالية أولاً.", "warning");
         state.mode = "ai";
         const ai = { id: "ai_" + rand(), name: "الذكاء الاصطناعي" };
         const game = freshGame(rand(), { id: state.profile.id, name: displayName(state.profile) }, ai);
@@ -1427,7 +1593,7 @@
           if (g.status === "playing" && opponentOf(g).id === m.by) {
             forfeitGame("forfeit");
           } else {
-            toast("👋 عاد خصمك إلى الصالة.");
+            toast("عاد خصمك إلى الصالة.", "wave");
             exitGame();
           }
         }
@@ -1479,7 +1645,7 @@
           cell.addEventListener("click", () => {
             const g = state.game;
             if (!g || g.status !== "playing") return;
-            if (g.turn !== seatOf(g)) return toast("⏳ ليس دورك!");
+            if (g.turn !== seatOf(g)) return toast("ليس دورك!", "clock");
             if (g.board[i]) return;
             doMove(i);
           });
@@ -1535,8 +1701,8 @@
         state.mode = null;
         hideWinOverlay();
         $("rematch-btn").classList.add("hidden");
-        $("rematch-btn").textContent = "إعادة 🔁";
-        $("rematch-btn").disabled = false;
+$("rematch-btn").innerHTML = `إعادة ${svgHtml("refresh", "btn-icon")}`;
+$("rematch-btn").disabled = false;
         renderUsers();
         showScreen("home");
       }
@@ -1571,18 +1737,30 @@
         renderWinOverlay(g);
       }
 
-      function renderTurnBanner(g) {
-        const banner = $("turn-banner");
-        const mySym = seatOf(g);
-        if (g.status === "playing") {
-          banner.classList.toggle("mine", g.turn === mySym);
-          banner.textContent = g.turn === mySym ? "دورك! 🍭" : `دور ${displayName(opponentOf(g))}…`;
-        } else if (g.reason === "draw") {
-          banner.textContent = "تعادل! 🤝";
-        } else {
-          banner.textContent = g.winner === mySym ? "فزت! 🎉" : `${displayName(opponentOf(g))} فاز!`;
-        }
-      }
+function renderTurnBanner(g) {
+  const banner = $("turn-banner");
+  const mySym = seatOf(g);
+  banner.textContent = "";
+  banner.appendChild(document.createTextNode(
+    g.status === "playing"
+      ? g.turn === mySym
+        ? "دورك! "
+        : `دور ${displayName(opponentOf(g))}…`
+      : g.reason === "draw"
+        ? "تعادل! "
+        : g.winner === mySym
+          ? "فزت! "
+          : `${displayName(opponentOf(g))} فاز!`
+  ));
+  if (g.status === "playing") {
+    banner.classList.toggle("mine", g.turn === mySym);
+    if (g.turn === mySym) banner.appendChild(svgEl("lollipop", "inline-ic"));
+  } else if (g.reason === "draw") {
+    banner.appendChild(svgEl("draw", "inline-ic"));
+  } else if (g.winner === mySym) {
+    banner.appendChild(svgEl("party", "inline-ic"));
+  }
+}
 
       function renderWinOverlay(g) {
         const rematchBtn = $("rematch-btn");
@@ -1595,36 +1773,36 @@
 
         rematchBtn.classList.remove("hidden");
         rematchBtn.disabled = false;
-        if (g.rematch && (g.rematch.me || g.rematch.opp)) {
-          rematchBtn.textContent = "بانتظار إعادة الخصم…";
-        } else {
-          rematchBtn.textContent = "إعادة 🔁";
-        }
+if (g.rematch && (g.rematch.me || g.rematch.opp)) {
+  rematchBtn.textContent = "بانتظار إعادة الخصم…";
+} else {
+  rematchBtn.innerHTML = `إعادة ${svgHtml("refresh", "btn-icon")}`;
+}
 
-        if (g.reason === "disconnect" || g.reason === "forfeit") {
-          $("win-emoji").textContent = g.winner === mySym ? "🏆" : "😵";
-          $("win-title").textContent = g.winner === mySym ? "فزت!" : "غادر الخصم";
-          $("win-sub").textContent =
-            g.reason === "disconnect"
-              ? "انقطع اتصاله."
-              : g.winner === mySym
-                ? "غادر اللعبة."
-                : "غادرت — عد إلى الصالة.";
-          if (g.winner === mySym) startConfetti();
-          $("win-overlay").classList.remove("hidden");
-          return;
-        }
+  if (g.reason === "disconnect" || g.reason === "forfeit") {
+    $("win-emoji").innerHTML = svgHtml(g.winner === mySym ? "trophy" : "dizzy");
+    $("win-title").textContent = g.winner === mySym ? "فزت!" : "غادر الخصم";
+    $("win-sub").textContent =
+      g.reason === "disconnect"
+        ? "انقطع اتصاله."
+        : g.winner === mySym
+          ? "غادر اللعبة."
+          : "غادرت — عد إلى الصالة.";
+    if (g.winner === mySym) startConfetti();
+    $("win-overlay").classList.remove("hidden");
+    return;
+  }
 
-        if (g.winner === mySym) {
-          $("win-emoji").textContent = "🎉";
-          $("win-title").textContent = "فزت!";
-          $("win-sub").textContent = "فوز جميل 🍓";
-          startConfetti();
-        } else {
-          $("win-emoji").textContent = "🍂";
-          $("win-title").textContent = "للأسف!";
-          $("win-sub").textContent = `${displayName(opponentOf(g))} أخذها هذه المرة. إعادة؟`;
-        }
+  if (g.winner === mySym) {
+    $("win-emoji").innerHTML = svgHtml("party");
+    $("win-title").textContent = "فزت!";
+    $("win-sub").innerHTML = `فوز جميل ${svgHtml("strawberry", "inline-ic")}`;
+    startConfetti();
+  } else {
+    $("win-emoji").innerHTML = svgHtml("leaf");
+    $("win-title").textContent = "للأسف!";
+    $("win-sub").textContent = `${displayName(opponentOf(g))} أخذها هذه المرة. إعادة؟`;
+  }
         $("win-overlay").classList.remove("hidden");
       }
 
@@ -1739,7 +1917,7 @@
       function boot() {
         buildBoard();
         if (window.mqtt) return startApp();
-        setConnStatus("جارٍ تحميل شبكة الحلويات… 🍬", "info");
+        setConnStatus("جارٍ تحميل شبكة الحلويات…", "info");
         window.__onMqttLoaded = (ok) => {
           if (!ok) {
             setConnStatus(
