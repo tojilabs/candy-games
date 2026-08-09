@@ -4,12 +4,616 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#ffe6f2" />
-  <title>Candy Games 🍬</title>
+  <title>Candy Games 🍬 · v5</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍭</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* style.css — Candy style design system for Candy Games 🍬 */
+
+    :root {
+      --pink: #ff6fa5;
+      --pink-soft: #ffd3e4;
+      --mint: #4ecdc4;
+      --mint-soft: #d3f5f0;
+      --purple: #a78bfa;
+      --purple-soft: #e9e2fd;
+      --yellow: #ffc94d;
+      --yellow-soft: #ffefc4;
+      --ink: #4a3a5a;
+      --ink-soft: #8a7a9a;
+      --card: rgba(255, 255, 255, 0.82);
+      --shadow: 0 14px 40px rgba(178, 120, 170, 0.18);
+      --shadow-soft: 0 6px 18px rgba(178, 120, 170, 0.14);
+      --radius: 26px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: "Fredoka", "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(150deg, #ffe6f2 0%, #e7f6f4 52%, #f1eaff 100%);
+      background-attachment: fixed;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body { overflow-x: hidden; }
+
+    /* ---------- decorative blobs & floaties ---------- */
+    .blobs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.55;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+    .b1 { width: 340px; height: 340px; background: #ffc3dd; top: -90px; left: -80px; }
+    .b2 { width: 300px; height: 300px; background: #c9f3ea; bottom: -70px; right: -70px; animation-delay: -6s; }
+    .b3 { width: 260px; height: 260px; background: #ddd2ff; top: 40%; right: -90px; animation-delay: -12s; }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(24px, -30px) scale(1.12); }
+    }
+
+    .floaty {
+      position: absolute;
+      font-size: 30px;
+      opacity: 0.5;
+      animation: floaty 9s ease-in-out infinite;
+    }
+    .f1 { top: 12%; left: 8%; animation-delay: 0s; }
+    .f2 { top: 22%; right: 10%; animation-delay: -3s; }
+    .f3 { bottom: 18%; left: 12%; animation-delay: -5s; }
+    .f4 { bottom: 30%; right: 8%; animation-delay: -7s; }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0) rotate(-6deg); }
+      50% { transform: translateY(-18px) rotate(8deg); }
+    }
+
+    /* ---------- layout ---------- */
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 22px 16px calc(40px + env(safe-area-inset-bottom));
+      min-height: 100vh;
+    }
+
+    .screen { display: none; animation: screenIn 0.35s ease both; }
+    .screen.active { display: block; }
+
+    @keyframes screenIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- cards ---------- */
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      padding: 28px 24px;
+    }
+
+    .center-card {
+      margin-top: 14vh;
+      text-align: center;
+    }
+
+    .logo-bubble {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      font-size: 48px;
+      border-radius: 32px;
+      background: linear-gradient(135deg, var(--pink-soft), var(--purple-soft));
+      box-shadow: var(--shadow-soft);
+      animation: wiggle 3.2s ease-in-out infinite;
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-4deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    .title {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #ff6fa5, #a78bfa, #4ecdc4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .tagline { margin-top: 4px; color: var(--ink-soft); font-weight: 500; }
+
+    .fine { margin-top: 22px; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+    .build-tag { margin-top: 6px; font-size: 11px; opacity: 0.55; }
+
+    /* ---------- quick login ---------- */
+    .quick-login { display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }
+
+    .quick-login input {
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--ink);
+      text-align: center;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 2px solid #f0d9ea;
+      background: rgba(255, 255, 255, 0.9);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .quick-login input::placeholder { color: #c4b2c9; }
+    .quick-login input:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 4px rgba(255, 111, 165, 0.18);
+    }
+
+    .quick-error {
+      font-size: 13px;
+      font-weight: 500;
+      color: #d9534f;
+      background: #ffeceb;
+      border-radius: 14px;
+      padding: 10px 14px;
+      line-height: 1.45;
+      animation: toastIn 0.3s ease both;
+    }
+
+    .quick-hint { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
+
+    .conn-status {
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 14px;
+      padding: 10px 14px;
+      line-height: 1.45;
+      animation: toastIn 0.3s ease both;
+    }
+    .conn-status.info { background: #fff4d6; color: #8a6410; }
+    .conn-status.error { background: #ffeceb; color: #d9534f; }
+
+    /* ---------- topbar ---------- */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .me { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .me-text { min-width: 0; }
+    .greeting { font-size: 19px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .online-count { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+
+    /* ---------- avatars ---------- */
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #ffd3e4, #d3f5f0);
+      border: 2px solid #fff;
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 17px;
+      color: #fff;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .avatar.lg { width: 60px; height: 60px; font-size: 21px; }
+    .avatar.sm { width: 42px; height: 42px; font-size: 15px; }
+
+    /* ---------- pills & buttons ---------- */
+    .pill {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 15px;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--pink), #ff9dbe);
+      box-shadow: 0 6px 16px rgba(255, 111, 165, 0.4);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+    .pill:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255, 111, 165, 0.45); }
+    .pill:active { transform: translateY(0) scale(0.97); }
+    .pill:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .pill.ghost {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--ink);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .pill.sm { padding: 8px 16px; font-size: 13.5px; }
+
+    .pill.accept { background: linear-gradient(135deg, var(--mint), #7ee2d9); box-shadow: 0 6px 16px rgba(78, 205, 196, 0.4); }
+    .pill.accept:hover { box-shadow: 0 10px 22px rgba(78, 205, 196, 0.45); }
+    .pill.decline { background: linear-gradient(135deg, #ff9d9d, #ffc1c1); box-shadow: 0 6px 16px rgba(255, 130, 130, 0.35); }
+
+    .pill.rematch {
+      background: linear-gradient(135deg, var(--purple), #c4b5fd);
+      box-shadow: 0 6px 16px rgba(167, 139, 250, 0.4);
+    }
+
+    /* ---------- section head ---------- */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-title { font-size: 20px; font-weight: 600; }
+
+    .online-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.65);
+      padding: 6px 12px;
+      border-radius: 999px;
+      box-shadow: var(--shadow-soft);
+    }
+    .dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--mint);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.55); }
+      50% { box-shadow: 0 0 0 6px rgba(78, 205, 196, 0); }
+    }
+
+    /* ---------- user list ---------- */
+    .user-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 52vh;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .user-list::-webkit-scrollbar { width: 6px; }
+    .user-list::-webkit-scrollbar-thumb { background: #e6cfe3; border-radius: 999px; }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      animation: rowIn 0.3s ease both;
+    }
+    @keyframes rowIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-sub { font-size: 12.5px; color: var(--ink-soft); }
+
+    .status-tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--mint-soft);
+      color: #1d9b92;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .status-tag .dot { width: 7px; height: 7px; }
+    .status-tag.ingame { background: var(--purple-soft); color: #7c5cd6; }
+    .status-tag.you { background: var(--yellow-soft); color: #a87a10; }
+
+    .play-btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 13.5px;
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--pink), #ff9dbe);
+      box-shadow: 0 5px 12px rgba(255, 111, 165, 0.4);
+      transition: transform 0.12s ease;
+      white-space: nowrap;
+    }
+    .play-btn:hover { transform: scale(1.06); }
+    .play-btn:active { transform: scale(0.95); }
+    .play-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .empty { text-align: center; padding: 40px 0; color: var(--ink-soft); }
+    .empty-emoji { font-size: 44px; margin-bottom: 8px; }
+
+    /* ---------- request banner ---------- */
+    .request-banner {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      width: min(440px, calc(100% - 32px));
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(18px);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      z-index: 30;
+      animation: bounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes bounceIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.9); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+    .request-banner .avatar { width: 42px; height: 42px; }
+    .rb-text { flex: 1; min-width: 0; font-size: 13.5px; line-height: 1.3; }
+    .rb-text strong { display: block; font-size: 15px; }
+    .rb-text span { color: var(--ink-soft); }
+    .request-banner .pill { padding: 9px 14px; font-size: 13px; }
+
+    /* ---------- game screen ---------- */
+    .game-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .game-title {
+      font-size: 17px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.65);
+      padding: 8px 16px;
+      border-radius: 999px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .scoreboard {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .score-card {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      position: relative;
+      transition: box-shadow 0.2s ease;
+    }
+    .score-card.thinking { box-shadow: 0 0 0 3px var(--yellow-soft), var(--shadow-soft); }
+    .score-avatar { position: relative; }
+    .symbol-badge {
+      position: absolute;
+      bottom: -4px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      border: 2px solid #fff;
+    }
+    .symbol-badge.x { background: var(--pink); }
+    .symbol-badge.o { background: var(--mint); }
+    .score-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .score-points {
+      margin-left: auto;
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .vs {
+      align-self: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.65);
+      border-radius: 999px;
+      padding: 8px 12px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .turn-banner {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 10px 16px;
+      margin-bottom: 14px;
+      border-radius: 999px;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      transition: background 0.2s ease;
+    }
+    .turn-banner.mine { background: linear-gradient(135deg, #fff3f8, #f0fffb); }
+
+    /* ---------- board ---------- */
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 360px;
+      margin: 0 auto;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(10px);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .cell {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: clamp(38px, 12vw, 56px);
+      font-weight: 700;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 6px 14px rgba(178, 120, 170, 0.14);
+      display: grid;
+      place-items: center;
+      transition: transform 0.1s ease, box-shadow 0.15s ease;
+    }
+    .cell:active:not(:disabled) { transform: scale(0.94); }
+    .cell:disabled { cursor: default; }
+
+    .cell.x { color: var(--pink); text-shadow: 0 3px 0 #ffb9d2; animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+    .cell.o { color: var(--mint); text-shadow: 0 3px 0 #a3e8e2; animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+    @keyframes popIn {
+      from { transform: scale(0.4); opacity: 0.3; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .cell.win {
+      background: linear-gradient(135deg, var(--yellow-soft), #fff7dd);
+      box-shadow: 0 0 0 3px var(--yellow), 0 8px 20px rgba(255, 201, 77, 0.45);
+      animation: winPop 0.5s ease both;
+    }
+    @keyframes winPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+
+    .game-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 18px;
+      min-height: 52px;
+    }
+
+    /* ---------- win overlay ---------- */
+    .win-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 240, 248, 0.35);
+      backdrop-filter: blur(6px);
+      animation: fadeIn 0.3s ease both;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    #confetti-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+    .win-card {
+      position: relative;
+      text-align: center;
+      padding: 36px 44px;
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    .win-emoji { font-size: 64px; animation: wiggle 1.4s ease-in-out infinite; }
+    .win-title { font-size: 28px; font-weight: 700; margin-top: 6px; }
+    .win-sub { margin-top: 4px; color: var(--ink-soft); font-weight: 500; }
+
+    .win-overlay .pill { margin-top: 20px; }
+
+    /* ---------- toasts ---------- */
+    .toasts {
+      position: fixed;
+      top: calc(14px + env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: min(400px, calc(100% - 32px));
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    .toast.out { animation: toastOut 0.3s ease both; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-18px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateY(-14px); }
+    }
+
+    /* ---------- utils ---------- */
+    .hidden { display: none !important; }
+
+    @media (max-width: 380px) {
+      .request-banner { flex-wrap: wrap; }
+      .request-banner .rb-text { flex-basis: calc(100% - 54px); }
+    }
+  </style>
 </head>
 <body>
   <div class="blobs" aria-hidden="true">
@@ -30,16 +634,14 @@
         <h1 class="title">Candy Games</h1>
         <p class="tagline">Mini games for the gang 💖</p>
         <form id="quick-login" class="quick-login" autocomplete="off">
-          <input id="quick-id" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Paste your Telegram ID" />
-          <input id="quick-nick" type="text" maxlength="30" placeholder="Nickname (optional)" />
+          <input id="quick-nick" type="text" maxlength="24" placeholder="Your nickname" autocomplete="nickname" />
           <button id="quick-btn" type="submit" class="pill">Log in 🍭</button>
           <p id="quick-error" class="quick-error hidden"></p>
           <p id="conn-status" class="conn-status hidden"></p>
-          <p class="quick-hint">Any number works — your nickname shows on your profile.</p>
+          <p class="quick-hint">No signup, no ID — just pick a name and play.</p>
         </form>
-        <p class="fine">Log in with your Telegram ID — pick a nickname, and your name &amp; pic show to the gang.</p>
-        <p class="fine">Log in with your Telegram ID — your name &amp; profile pic are pulled automatically.</p>
-        <p class="fine build-tag">build v4</p>
+        <p class="fine">Your name shows to whoever's online at the same time.</p>
+        <p class="fine build-tag">build v5</p>
       </div>
     </section>
 
@@ -64,7 +666,7 @@
       <ul id="user-list" class="user-list"></ul>
       <div id="empty-state" class="empty hidden">
         <div class="empty-emoji">🍯</div>
-        <p>Nobody's here yet.<br />Share the link with your Telegram gang!</p>
+        <p>Nobody's here yet.<br />Share the link with your gang!</p>
       </div>
 
       <div id="request-banner" class="request-banner hidden" role="alert">
@@ -152,6 +754,823 @@
       tryLoad(0);
     })();
   </script>
-  <script src="js/app.js?v=4"></script>
+
+  <script>
+    // app.js — Candy Games (single-file / GitHub Pages build).
+    // Realtime works over a public MQTT broker (no backend needed): presence,
+    // game requests, and the 1v1 Tic-Tac-Toe engine all run in the browser.
+    (() => {
+      "use strict";
+
+      const APP_VERSION = "5";
+      window.__APP_VERSION = APP_VERSION;
+      window.document.title = "Candy Games 🍬 · v" + APP_VERSION;
+
+      // Surface any runtime error on screen so failures are never silent.
+      window.addEventListener("error", (e) => {
+        const m = (e && e.message) || "Unknown error";
+        setConnStatus("Error: " + m + (e && e.filename ? " (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : ""), "error");
+        toast("⚠️ " + m);
+      });
+      window.addEventListener("unhandledrejection", (e) => {
+        const r = e && e.reason;
+        setConnStatus("Error: " + (r ? r.message || String(r) : "async error"), "error");
+      });
+
+      const $ = (id) => document.getElementById(id);
+      const screens = { login: $("screen-login"), home: $("screen-home"), game: $("screen-game") };
+      const PROFILE_KEY = "candygames.profile";
+      const UID_KEY = "candygames.uid";
+
+      // Change this so different groups don't bump into each other on the shared broker.
+      const ROOM = "tojigang";
+      const BROKERS = [
+        "wss://broker.emqx.io:8084/mqtt",
+        "wss://test.mosquitto.org:8081/mqtt",
+        "wss://broker.hivemq.com:8884/mqtt",
+      ];
+      const BROKER_TIMEOUT_MS = 10000;
+      const HEARTBEAT_MS = 7000;
+      const PRESENCE_STALE_MS = 18000;
+      const REQUEST_TTL_MS = 30000;
+
+      const WIN_LINES = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6],
+      ];
+
+      const AVATAR_COLORS = [
+        "linear-gradient(135deg,#ff9dbe,#a78bfa)",
+        "linear-gradient(135deg,#4ecdc4,#a78bfa)",
+        "linear-gradient(135deg,#ffc94d,#ff9dbe)",
+        "linear-gradient(135deg,#a78bfa,#4ecdc4)",
+        "linear-gradient(135deg,#ff8f6f,#ffc94d)",
+      ];
+
+      const state = {
+        profile: null,
+        mqtt: null,
+        connected: false,
+        users: new Map(), // id -> { id, name, inGame, ts }
+        requestId: null,
+        requestQueue: [],
+        pendingRequest: null, // { reqId, to, timer }
+        game: null,
+        boardButtons: [],
+        heartbeatTimer: null,
+        pruneTimer: null,
+        sessionId: null,
+      };
+
+      const rand = () => Math.random().toString(36).slice(2, 10);
+      const colorFor = (id) => AVATAR_COLORS[Number(id) % AVATAR_COLORS.length];
+      const displayName = (p) => p.name || p.nickname || `Friend ${String(p.id).slice(-4)}`;
+
+      const T = {
+        presence: (id) => `cg/${ROOM}/presence/${id}`,
+        presenceAll: () => `cg/${ROOM}/presence/+`,
+        req: (id) => `cg/${ROOM}/req/${id}`,
+        game: (id) => `cg/${ROOM}/game/${id}`,
+      };
+
+      // ---------- helpers ----------
+      const el = (tag, cls, text) => {
+        const node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text != null) node.textContent = text;
+        return node;
+      };
+
+      function paintAvatar(node, p) {
+        node.textContent = "";
+        node.style.backgroundImage = "";
+        node.title = "";
+        const name = displayName(p);
+        if (p.photo) {
+          node.style.backgroundImage = `url(${p.photo})`;
+          node.title = name;
+        } else {
+          node.textContent = name.slice(0, 2).toUpperCase();
+          node.style.background = colorFor(p.id);
+        }
+      }
+
+      function showScreen(name) {
+        Object.entries(screens).forEach(([k, s]) => s.classList.toggle("active", k === name));
+      }
+
+      function toast(message) {
+        const wrap = $("toasts");
+        const t = el("div", "toast", message);
+        wrap.appendChild(t);
+        setTimeout(() => {
+          t.classList.add("out");
+          setTimeout(() => t.remove(), 320);
+        }, 2600);
+        while (wrap.children.length > 3) wrap.firstElementChild.remove();
+      }
+
+      function setConnStatus(message, kind) {
+        const el = $("conn-status");
+        if (!message) {
+          el.classList.add("hidden");
+          el.textContent = "";
+          return;
+        }
+        el.textContent = message;
+        el.className = "conn-status " + (kind || "info");
+      }
+
+      // ---------- login ----------
+      const quickForm = $("quick-login");
+      const quickNick = $("quick-nick");
+      const quickError = $("quick-error");
+
+      function showQuickError(message) {
+        quickError.textContent = message;
+        quickError.classList.remove("hidden");
+      }
+
+      quickForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        quickError.classList.add("hidden");
+        const nickname = quickNick.value.trim();
+        if (!nickname) {
+          showQuickError("Pick a nickname first! 🍭");
+          quickNick.focus();
+          return;
+        }
+        let uid = localStorage.getItem(UID_KEY);
+        if (!uid) {
+          uid = String(1 + Math.floor(Math.random() * 9000000000));
+          localStorage.setItem(UID_KEY, uid);
+        }
+        const profile = { id: uid, name: nickname };
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+        startSession(profile);
+      });
+
+      // Belt-and-braces: also catch a direct button click in case the form
+      // submit event is swallowed by anything.
+      $("quick-btn").addEventListener("click", (e) => {
+        e.preventDefault();
+        quickForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+      });
+
+      function logout() {
+        setInGame(false);
+        publishPresenceNow("");
+        cleanupTimers();
+        if (state.mqtt) {
+          try { state.mqtt.end(true); } catch { /* ignore */ }
+        }
+        state.mqtt = null;
+        state.profile = null;
+        state.users.clear();
+        state.game = null;
+        setConnStatus("");
+        localStorage.removeItem(PROFILE_KEY);
+        showScreen("login");
+      }
+
+      // ---------- MQTT transport ----------
+      function startSession(profile) {
+        state.profile = profile;
+        state.sessionId = `${profile.id}_${rand()}`;
+        setConnStatus("Connecting to the candy network… 🍬", "info");
+        tryBroker(profile, 0);
+      }
+
+      function tryBroker(profile, i) {
+        if (i >= BROKERS.length) {
+          setConnStatus(
+            "Couldn't reach any realtime broker — this network may be blocking WebSocket connections. Try a different network or another browser.",
+            "error"
+          );
+          toast("⚠️ Connection failed");
+          return;
+        }
+        const client = mqtt.connect(BROKERS[i], {
+          clientId: `cg_${state.sessionId}`,
+          keepalive: 10,
+          reconnectPeriod: 3000,
+          will: { topic: T.presence(profile.id), payload: "", qos: 0, retain: false },
+        });
+        let aborted = false;
+        const timer = setTimeout(() => {
+          if (aborted) return;
+          aborted = true;
+          try { client.end(true); } catch { /* ignore */ }
+          tryBroker(profile, i + 1);
+        }, BROKER_TIMEOUT_MS);
+
+        client.on("connect", () => {
+          if (aborted) return;
+          clearTimeout(timer);
+          state.mqtt = client;
+          state.connected = true;
+          setConnStatus("");
+          state.mqtt.subscribe(T.presenceAll());
+          state.mqtt.subscribe(T.req(profile.id));
+          publishPresenceNow("");
+          startHeartbeat();
+          renderUsers();
+          showScreen("home");
+        });
+
+        // Transient errors are fine — mqtt.js keeps retrying until the timeout above fires.
+        client.on("error", () => { /* ignore */ });
+        client.on("message", onMqttMessage);
+      }
+
+      function startHeartbeat() {
+        cleanupTimers();
+        state.heartbeatTimer = setInterval(() => publishPresenceNow(""), HEARTBEAT_MS);
+        state.pruneTimer = setInterval(prunePresence, 10000);
+      }
+
+      function cleanupTimers() {
+        if (state.heartbeatTimer) clearInterval(state.heartbeatTimer);
+        if (state.pruneTimer) clearInterval(state.pruneTimer);
+        state.heartbeatTimer = state.pruneTimer = null;
+      }
+
+      function publishPresenceNow(empty) {
+        if (empty) {
+          safePublish(T.presence(state.profile.id), "");
+          return;
+        }
+        const g = state.game && state.game.status === "playing" ? 1 : 0;
+        const msg = { n: displayName(state.profile), g, ts: Date.now() };
+        safePublish(T.presence(state.profile.id), JSON.stringify(msg));
+      }
+
+      function setInGame(inGame) {
+        // Presence is recomputed on every heartbeat; fire one right away too.
+        publishPresenceNow();
+      }
+
+      function safePublish(topic, payload) {
+        if (state.connected && state.mqtt) {
+          try { state.mqtt.publish(topic, payload); } catch { /* ignore */ }
+        }
+      }
+
+      function onMqttMessage(topic, payloadBuffer) {
+        let topicParts = topic.split("/");
+        const kind = topicParts[2];
+        const payload = payloadBuffer.toString();
+
+        if (kind === "presence") return handlePresence(topicParts[3], payload);
+        if (kind === "req") return handleReq(payload);
+        if (kind === "game") return handleGame(payload);
+      }
+
+      // ---------- presence ----------
+      function handlePresence(id, payload) {
+        if (!payload) {
+          state.users.delete(id);
+          checkForfeitByGone(id);
+          renderUsers();
+          return;
+        }
+        let data;
+        try { data = JSON.parse(payload); } catch { return; }
+        if (!data.n) return;
+        state.users.set(id, { id, name: data.n, inGame: data.g === 1, ts: data.ts });
+        renderUsers();
+      }
+
+      function prunePresence() {
+        const now = Date.now();
+        let changed = false;
+        for (const [id, u] of state.users) {
+          if (id === state.profile.id) continue;
+          if (now - u.ts > PRESENCE_STALE_MS) {
+            state.users.delete(id);
+            checkForfeitByGone(id);
+            changed = true;
+          }
+        }
+        if (changed) renderUsers();
+      }
+
+      function checkForfeitByGone(id) {
+        const g = state.game;
+        if (!g || g.status !== "playing") return;
+        if (opponentOf(g).id === id) forfeitGame("disconnect");
+      }
+
+      function renderUsers() {
+        const list = $("user-list");
+        list.innerHTML = "";
+        const others = [...state.users.values()].filter((u) => u.id !== state.profile.id);
+        $("online-num").textContent = others.length;
+
+        if (!others.length) {
+          $("empty-state").classList.remove("hidden");
+          return;
+        }
+        $("empty-state").classList.add("hidden");
+
+        const inGameWith = state.game && state.game.status === "playing" ? opponentOf(state.game).id : null;
+
+        others.forEach((u, i) => {
+          const row = el("li", "user-row");
+          row.style.animationDelay = `${i * 0.04}s`;
+
+          const avatar = el("div", "avatar");
+          paintAvatar(avatar, u);
+
+          const info = el("div", "user-info");
+          const name = el("div", "user-name", u.name);
+          const sub = el("div", "user-sub", "Member of the gang");
+          info.append(name, sub);
+
+          const tag = el("span", "status-tag", u.inGame ? "In a game" : "Online");
+          if (u.inGame) tag.classList.add("ingame");
+          else tag.prepend(el("span", "dot"));
+
+          row.append(avatar, info, tag);
+
+          const busy = u.id === inGameWith;
+          if (!busy) {
+            const btn = el("button", "play-btn", "Play 🎮");
+            btn.disabled = u.inGame;
+            if (u.inGame) btn.textContent = "Playing";
+            btn.addEventListener("click", () => sendInvite(u));
+            row.append(btn);
+          }
+
+          list.appendChild(row);
+        });
+      }
+
+      // ---------- game requests ----------
+      function sendInvite(target) {
+        if (state.game) return;
+        if (target.inGame) return toast("⚠️ They're already in a game.");
+        const reqId = rand();
+        state.pendingRequest = {
+          reqId,
+          to: target,
+          timer: setTimeout(() => {
+            safePublish(T.req(target.id), JSON.stringify({ t: "cancel", reqId }));
+            if (state.pendingRequest && state.pendingRequest.reqId === reqId) state.pendingRequest = null;
+            toast("⏳ Your challenge expired.");
+          }, REQUEST_TTL_MS),
+        };
+        safePublish(T.req(target.id), JSON.stringify({ t: "invite", reqId, from: { id: state.profile.id, name: displayName(state.profile) } }));
+        toast(`🍬 Challenge sent to ${target.name}!`);
+      }
+
+      function handleReq(payload) {
+        let m;
+        try { m = JSON.parse(payload); } catch { return; }
+
+        if (m.t === "invite") {
+          if (state.game && state.game.status === "playing") {
+            safePublish(T.req(m.from.id), JSON.stringify({ t: "reply", reqId: m.reqId, accept: false, from: { id: state.profile.id, name: displayName(state.profile) } }));
+            toast("⚠️ You're already in a game.");
+            return;
+          }
+          state.requestQueue.push({ reqId: m.reqId, from: m.from });
+          if (!state.requestId) showNextRequest();
+        } else if (m.t === "reply") {
+          const pending = state.pendingRequest;
+          if (!pending || pending.reqId !== m.reqId) return;
+          clearTimeout(pending.timer);
+          state.pendingRequest = null;
+          if (m.accept) startGame(pending.to);
+          else toast(`${m.from.name} declined your challenge 😢`);
+        } else if (m.t === "cancel") {
+          if (state.requestId === m.reqId) {
+            state.requestId = null;
+            $("request-banner").classList.add("hidden");
+            state.requestQueue = state.requestQueue.filter((r) => r.reqId !== m.reqId);
+            showNextRequest();
+            toast("⏳ That challenge expired.");
+          }
+        }
+      }
+
+      function showNextRequest() {
+        const req = state.requestQueue.shift();
+        if (!req) return;
+        state.requestId = req.reqId;
+        state.currentReq = req;
+        paintAvatar($("rb-avatar"), { id: req.from.id, name: req.from.name });
+        $("rb-name").textContent = req.from.name;
+        $("request-banner").classList.remove("hidden");
+      }
+
+      function hideRequestBanner() {
+        state.requestId = null;
+        state.currentReq = null;
+        $("request-banner").classList.add("hidden");
+      }
+
+      function respondRequest(accept) {
+        const req = state.currentReq;
+        hideRequestBanner();
+        if (req) {
+          safePublish(T.req(req.from.id), JSON.stringify({ t: "reply", reqId: req.reqId, accept, from: { id: state.profile.id, name: displayName(state.profile) } }));
+        }
+        showNextRequest();
+      }
+
+      $("rb-accept").addEventListener("click", () => respondRequest(true));
+      $("rb-decline").addEventListener("click", () => respondRequest(false));
+
+      // ---------- game engine ----------
+      const seatOf = (g) => (g.seats.X.id === state.profile.id ? "X" : "O");
+      const opponentOf = (g) => (g.seats.X.id === state.profile.id ? g.seats.O : g.seats.X);
+
+      function freshGame(gameId, a, b) {
+        // Randomize who is X (X always moves first).
+        const flip = Math.random() < 0.5;
+        const x = flip ? a : b;
+        const o = flip ? b : a;
+        return {
+          t: "init",
+          gameId,
+          seats: { X: x, O: o },
+          board: Array(9).fill(null),
+          turn: "X",
+          status: "playing",
+          winner: null,
+          winLine: null,
+          reason: null,
+          scores: {},
+          rematch: { me: false, opp: false },
+        };
+      }
+
+      function startGame(opponentProfile) {
+        const game = freshGame(rand(), { id: state.profile.id, name: displayName(state.profile) }, { id: opponentProfile.id, name: opponentProfile.name });
+        state.game = game;
+        state.mqtt.subscribe(T.game(game.gameId));
+        enterGame();
+        safePublish(T.game(game.gameId), JSON.stringify(game));
+        setInGame(true);
+      }
+
+      function handleGame(payload) {
+        let m;
+        try { m = JSON.parse(payload); } catch { return; }
+
+        if (m.t === "init") {
+          state.mqtt.subscribe(T.game(m.gameId));
+          state.game = {
+            ...m,
+            rematch: { me: false, opp: false },
+          };
+          setInGame(true);
+          enterGame();
+        } else if (m.t === "state") {
+          const g = state.game;
+          if (!g || g.gameId !== m.gameId) return;
+          g.board = m.board;
+          g.turn = m.turn;
+          g.status = m.status;
+          g.winner = m.winner;
+          g.winLine = m.winLine;
+          g.reason = m.reason;
+          g.scores = m.scores;
+          renderGame();
+        } else if (m.t === "rematch") {
+          const g = state.game;
+          if (!g || g.gameId !== m.gameId || g.status !== "over") return;
+          g.rematch.opp = true;
+          maybeStartRematch();
+        } else if (m.t === "leave") {
+          const g = state.game;
+          if (!g || g.gameId !== m.gameId) return;
+          if (g.status === "playing" && opponentOf(g).id === m.by) {
+            forfeitGame("forfeit");
+          } else {
+            toast("👋 Your opponent went back to the lobby.");
+            exitGame();
+          }
+        }
+      }
+
+      function publishGameState() {
+        const g = state.game;
+        safePublish(T.game(g.gameId), JSON.stringify({
+          t: "state",
+          gameId: g.gameId,
+          board: g.board,
+          turn: g.turn,
+          status: g.status,
+          winner: g.winner,
+          winLine: g.winLine,
+          reason: g.reason,
+          scores: g.scores,
+        }));
+      }
+
+      function checkWin(board) {
+        for (const line of WIN_LINES) {
+          const [a, b, c] = line;
+          if (board[a] && board[a] === board[b] && board[a] === board[c]) return line;
+        }
+        return null;
+      }
+
+      function forfeitGame(reason) {
+        const g = state.game;
+        g.status = "over";
+        g.winner = seatOf(g);
+        g.winLine = null;
+        g.reason = reason;
+        g.scores[state.profile.id] = (g.scores[state.profile.id] || 0) + 1;
+        publishGameState();
+        setInGame(false);
+        renderGame();
+      }
+
+      // ---------- game UI ----------
+      function buildBoard() {
+        const board = $("board");
+        board.innerHTML = "";
+        state.boardButtons = [];
+        for (let i = 0; i < 9; i++) {
+          const cell = el("button", "cell");
+          cell.addEventListener("click", () => {
+            const g = state.game;
+            if (!g || g.status !== "playing") return;
+            if (g.turn !== seatOf(g)) return toast("⏳ Not your turn!");
+            if (g.board[i]) return;
+            doMove(i);
+          });
+          board.appendChild(cell);
+          state.boardButtons.push(cell);
+        }
+      }
+
+      function doMove(index) {
+        const g = state.game;
+        const sym = seatOf(g);
+        g.board[index] = sym;
+        const line = checkWin(g.board);
+        if (line) {
+          g.status = "over";
+          g.winner = sym;
+          g.winLine = line;
+          g.reason = "win";
+          g.scores[g.seats[sym].id] = (g.scores[g.seats[sym].id] || 0) + 1;
+          publishGameState();
+          setInGame(false);
+          renderGame();
+          return;
+        }
+        if (g.board.every(Boolean)) {
+          g.status = "over";
+          g.winner = null;
+          g.winLine = null;
+          g.reason = "draw";
+          publishGameState();
+          setInGame(false);
+          renderGame();
+          return;
+        }
+        g.turn = g.turn === "X" ? "O" : "X";
+        publishGameState();
+        renderGame();
+      }
+
+      function enterGame() {
+        state.rematchVote = false;
+        buildBoard();
+        renderGame();
+        showScreen("game");
+      }
+
+      function exitGame() {
+        state.game = null;
+        hideWinOverlay();
+        $("rematch-btn").classList.add("hidden");
+        $("rematch-btn").textContent = "Rematch 🔁";
+        $("rematch-btn").disabled = false;
+        renderUsers();
+        showScreen("home");
+      }
+
+      function renderGame() {
+        const g = state.game;
+        if (!g) return;
+        const mySym = seatOf(g);
+        const opp = opponentOf(g);
+
+        paintAvatar($("score-me-avatar"), state.profile);
+        paintAvatar($("score-opp-avatar"), opp);
+        $("score-me-name").textContent = displayName(state.profile);
+        $("score-opp-name").textContent = opp.name;
+        $("score-me-points").textContent = g.scores[state.profile.id] || 0;
+        $("score-opp-points").textContent = g.scores[opp.id] || 0;
+        $("score-me-symbol").className = `symbol-badge ${mySym}`;
+        $("score-opp-symbol").className = `symbol-badge ${mySym === "X" ? "O" : "X"}`;
+
+        $("score-me-avatar").parentElement.parentElement.classList.toggle("thinking", g.turn === mySym);
+        $("score-opp-avatar").parentElement.parentElement.classList.toggle("thinking", g.turn !== mySym);
+
+        state.boardButtons.forEach((cell, i) => {
+          cell.textContent = g.board[i] || "";
+          cell.disabled = g.status !== "playing" || g.turn !== mySym || !!g.board[i];
+          cell.classList.toggle("x", g.board[i] === "X");
+          cell.classList.toggle("o", g.board[i] === "O");
+          cell.classList.toggle("win", !!(g.winLine && g.winLine.includes(i)));
+        });
+
+        renderTurnBanner(g);
+        renderWinOverlay(g);
+      }
+
+      function renderTurnBanner(g) {
+        const banner = $("turn-banner");
+        const mySym = seatOf(g);
+        if (g.status === "playing") {
+          banner.classList.toggle("mine", g.turn === mySym);
+          banner.textContent = g.turn === mySym ? "Your turn! 🍭" : `${displayName(opponentOf(g))}'s turn…`;
+        } else if (g.reason === "draw") {
+          banner.textContent = "It's a draw! 🤝";
+        } else {
+          banner.textContent = g.winner === mySym ? "You win! 🎉" : `${displayName(opponentOf(g))} wins!`;
+        }
+      }
+
+      function renderWinOverlay(g) {
+        const rematchBtn = $("rematch-btn");
+        const mySym = seatOf(g);
+        if (g.status === "playing") {
+          rematchBtn.classList.add("hidden");
+          hideWinOverlay();
+          return;
+        }
+
+        rematchBtn.classList.remove("hidden");
+        rematchBtn.disabled = false;
+        if (g.rematch && (g.rematch.me || g.rematch.opp)) {
+          rematchBtn.textContent = "Waiting for your rematch…";
+        } else {
+          rematchBtn.textContent = "Rematch 🔁";
+        }
+
+        if (g.reason === "disconnect" || g.reason === "forfeit") {
+          $("win-emoji").textContent = g.winner === mySym ? "🏆" : "😵";
+          $("win-title").textContent = g.winner === mySym ? "You win!" : "Opponent left";
+          $("win-sub").textContent =
+            g.reason === "disconnect"
+              ? "They disconnected."
+              : g.winner === mySym
+                ? "They left the game."
+                : "You left — head back to the lobby.";
+          if (g.winner === mySym) startConfetti();
+          $("win-overlay").classList.remove("hidden");
+          return;
+        }
+
+        if (g.winner === mySym) {
+          $("win-emoji").textContent = "🎉";
+          $("win-title").textContent = "You win!";
+          $("win-sub").textContent = "Sweet victory 🍓";
+          startConfetti();
+        } else {
+          $("win-emoji").textContent = "🍂";
+          $("win-title").textContent = "So close!";
+          $("win-sub").textContent = `${displayName(opponentOf(g))} takes this one. Rematch?`;
+        }
+        $("win-overlay").classList.remove("hidden");
+      }
+
+      function hideWinOverlay() {
+        $("win-overlay").classList.add("hidden");
+      }
+
+      $("back-btn").addEventListener("click", () => {
+        const g = state.game;
+        if (g) {
+          safePublish(T.game(g.gameId), JSON.stringify({ t: "leave", gameId: g.gameId, by: state.profile.id }));
+          setInGame(false);
+        }
+        exitGame();
+      });
+
+      $("rematch-btn").addEventListener("click", () => {
+        const g = state.game;
+        if (!g || g.status !== "over") return;
+        g.rematch.me = true;
+        $("rematch-btn").textContent = "Waiting…";
+        $("rematch-btn").disabled = true;
+        hideWinOverlay();
+        safePublish(T.game(g.gameId), JSON.stringify({ t: "rematch", gameId: g.gameId, by: state.profile.id }));
+        maybeStartRematch();
+      });
+
+      function maybeStartRematch() {
+        const g = state.game;
+        if (!g || g.status !== "over" || !g.rematch.me || !g.rematch.opp) return;
+        g.rematch = { me: false, opp: false };
+        const oldX = g.seats.X;
+        g.seats = { X: g.seats.O, O: oldX }; // swap so the other player goes first
+        g.board = Array(9).fill(null);
+        g.turn = "X";
+        g.status = "playing";
+        g.winner = null;
+        g.winLine = null;
+        g.reason = null;
+        state.rematchVote = false;
+        safePublish(T.game(g.gameId), JSON.stringify({ ...g }));
+        setInGame(true);
+        renderGame();
+      }
+
+      $("logout-btn").addEventListener("click", logout);
+
+      // ---------- confetti ----------
+      let confettiRaf = null;
+      function startConfetti() {
+        const canvas = $("confetti-canvas");
+        const ctx = canvas.getContext("2d");
+        const colors = ["#ff6fa5", "#4ecdc4", "#ffc94d", "#a78bfa", "#ff9dbe"];
+        const pieces = [];
+        const resize = () => {
+          canvas.width = canvas.offsetWidth * devicePixelRatio;
+          canvas.height = canvas.offsetHeight * devicePixelRatio;
+          ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        };
+        resize();
+        window.addEventListener("resize", resize);
+
+        for (let i = 0; i < 120; i++) {
+          pieces.push({
+            x: Math.random() * canvas.offsetWidth,
+            y: -20 - Math.random() * canvas.offsetHeight * 0.6,
+            w: 6 + Math.random() * 7,
+            h: 8 + Math.random() * 8,
+            vx: -1.4 + Math.random() * 2.8,
+            vy: 2 + Math.random() * 3.4,
+            rot: Math.random() * Math.PI,
+            vr: -0.2 + Math.random() * 0.4,
+            color: colors[(Math.random() * colors.length) | 0],
+          });
+        }
+
+        if (confettiRaf) cancelAnimationFrame(confettiRaf);
+        const tick = () => {
+          ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+          let alive = false;
+          pieces.forEach((p) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rot += p.vr;
+            if (p.y < canvas.offsetHeight + 20) alive = true;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+          });
+          confettiRaf = alive ? requestAnimationFrame(tick) : null;
+          if (!alive) window.removeEventListener("resize", resize);
+        };
+        tick();
+      }
+
+      // ---------- boot ----------
+      function boot() {
+        buildBoard();
+        if (window.mqtt) return startApp();
+        setConnStatus("Loading the candy network… 🍬", "info");
+        window.__onMqttLoaded = (ok) => {
+          if (!ok) {
+            setConnStatus(
+              "Couldn't load the connection library from any CDN — this network may be blocking it. Try a different network or another browser.",
+              "error"
+            );
+            return;
+          }
+          startApp();
+        };
+      }
+
+      function startApp() {
+        setConnStatus("");
+        const saved = localStorage.getItem(PROFILE_KEY);
+        if (saved) {
+          try {
+            startSession(JSON.parse(saved));
+            return;
+          } catch { /* fall through to login */ }
+        }
+        showScreen("login");
+      }
+
+      boot();
+    })();
+  </script>
 </body>
 </html>
